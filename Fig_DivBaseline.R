@@ -14,7 +14,7 @@ Theme=theme_classic(base_size=11, base_family="Helvetica") +
 Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fill=NA))
 
 # set wd
- setwd("/Users/cata/Documents/CGLab/GitHub/FunExp")
+ setwd("/Users/cata/Documents/CGLab/GitHub/FunExp_Rstudio/FunExp")
 
 #Color friendly: The palette with black:
 cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
@@ -48,13 +48,22 @@ Baseline2=left_join(Baseline, leaves_count, by = "leaf_age_weeks")
 Baseline2$w_richness=Baseline2$richness/Baseline2$count
 
 # plot panels
-rich_regional=ggplot(Baseline, aes(leaf_age_weeks, richness))  + geom_point(size=2)+ Theme + ylab('Richness') + xlab('Leaf age (weeks)') + geom_smooth(method=lm, formula=y ~ poly(x,2), se=FALSE, color='black', size=0.5) + annotate('text', label='a.', x=1, y=100)
-rich_local=ggplot(Baseline2, aes(leaf_age_weeks, w_richness))  + geom_point(size=2)+ Theme + ylab('Weighted Richness per leaf') + xlab('Leaf age (weeks)') + geom_smooth(method='lm', formula= y ~ poly(x,2), se=FALSE, color='black', size=0.5)+ annotate('text', label='b.', x=1, y=4)
+rich_regional=ggplot(Baseline, aes(leaf_age_weeks, richness))  + 
+  geom_point(size=2)+ Theme + ylab('Richness') + 
+  xlab('Leaf age (weeks)') + 
+  geom_smooth(method=lm, formula=y ~ poly(x,2), se=FALSE, color='black', size=0.5) + 
+  annotate('text', label='a.', x=1, y=115)
+rich_local=ggplot(Baseline2, aes(leaf_age_weeks, w_richness))  + 
+  geom_point(size=2)+ Theme + ylab('Weighted Richness per leaf') + 
+  xlab('Leaf age (weeks)') + 
+  geom_smooth(method='lm', formula= y ~ poly(x,2), se=FALSE, color='black', size=0.5)+ 
+  annotate('text', label='b.', x=1, y=4)
 
 
 Fig_divControl=arrangeGrob(rich_regional, rich_local, ncol=2)
 quartz(width=6, height=3)
 plot(Fig_divControl)
+quartz.save('Figures/Fig_div_time_controls.png', type='png', dpi=300)
 
 # stats
 # rich regional
