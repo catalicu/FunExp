@@ -5,6 +5,7 @@ library(plyr)
 library(nlme)
 library(gridExtra)
 library(dplyr)
+library(car)
 
 # Plot themes
 ## With legend
@@ -47,16 +48,16 @@ Baseline2=left_join(Baseline, leaves_count, by = "leaf_age_weeks")
 # create weighted version of richness
 Baseline2$w_richness=Baseline2$richness/Baseline2$count
 
-# plot panels
+# plot richness panels
 rich_regional=ggplot(Baseline, aes(leaf_age_weeks, richness))  + 
   geom_point(size=2)+ Theme + ylab('Richness') + 
   xlab('Leaf age (weeks)') + 
-  geom_smooth(method=lm, formula=y ~ poly(x,2), se=FALSE, color='black', size=0.5) + 
+  geom_smooth(method=lm, formula=y ~ (x), se=FALSE, color='black', size=0.5) + 
   annotate('text', label='a.', x=1, y=115)
 rich_local=ggplot(Baseline2, aes(leaf_age_weeks, w_richness))  + 
   geom_point(size=2)+ Theme + ylab('Weighted Richness per leaf') + 
   xlab('Leaf age (weeks)') + 
-  geom_smooth(method='lm', formula= y ~ poly(x,2), se=FALSE, color='black', size=0.5)+ 
+  geom_smooth(method='lm', formula= y ~ (x), se=FALSE, color='black', size=0.5)+ 
   annotate('text', label='b.', x=1, y=4)
 
 
@@ -69,9 +70,29 @@ quartz.save('Figures/Fig_div_time_controls.png', type='png', dpi=300)
 # rich regional
 model_baseline=glm(richness ~ leaf_age_weeks, data=Baseline)
 summary(model_baseline)
+Anova(model_baseline)
 
 # rich_local
 model_baseline2a=glm(w_richness ~ leaf_age_weeks, data=Baseline2)
-model_baseline2b=glm(w_richness ~ leaf_age_weeks + leaf_age_weeks^2, data=Baseline2)
+model_baseline2b=glm(w_richness ~ poly(leaf_age_weeks,2), data=Baseline2)
 AIC(model_baseline2a, model_baseline2b)
 summary(model_baseline2a)
+Anova(model_baseline2a) # wald test
+
+### repeat for evenness
+# plot evenness panels
+eve_regional=ggplot(Baseline, aes(leaf_age_weeks, evenness))  + 
+  geom_point(size=2)+ Theme + ylab('Richness') + 
+  xlab('Leaf age (weeks)') + 
+  geom_smooth(method=lm, formula=y ~ (x), se=FALSE, color='black', size=0.5) + 
+  annotate('text', label='a.', x=0.8, y=0.7)
+
+
+plot(eve_regional)
+quartz.save('Figures/Fig_eve_time_controls_supmat.png', type='png', dpi=300)
+
+# stats
+# eve regional
+model_eve_baseline=glm(evenness ~ leaf_age_weeks, data=Baseline)
+summary(model_eve_baseline)
+Anova(model_eve_baseline)
