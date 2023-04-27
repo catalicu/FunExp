@@ -22,6 +22,9 @@ ASVtable=read.table('input_data/ASVtable_FunExp12021-03-24.txt', header=TRUE)
 TAXtable=read.table('input_data/TAXtable_FunExp12021-03-24.txt', header=TRUE)
 meta.table=read.table('input_data/METAtable_FunExp12021-03-24_sampleNamesFIX.txt', header=TRUE)
 fun.table=read.table('input_data/FunExp_metadata.txt', header=TRUE)
+div.table=read.table('input_data/MetaDiv_table_FunExp12021-03-30.txt', header=TRUE)
+colnames(div.table)[2]='Treatment'
+
 fundiv.table=left_join(fun.table, div.table)
 
 ## format data
@@ -54,7 +57,7 @@ fundiv.table2=left_join(fundiv.table, meta.table2)
 # Figures
 rich.plot=ggplot(meta.div2, aes(leaf_age_weeks, log(richness))) + 
   geom_jitter(size=3, color='black', shape=21, aes( fill=treatment))+  
-  geom_smooth(method='gam', se=FALSE, color='black', linetype='dashed') + 
+  geom_smooth(method='lm', se=FALSE, color='black', linetype='dashed') + 
   ylab('log(ASV richness)') + xlab('Leaf age (weeks)')  + 
   xlab('') + Theme2 + scale_fill_manual(values=c('black', 'white')) + 
   theme(legend.position = 'none') +
