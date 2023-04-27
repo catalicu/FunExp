@@ -55,7 +55,7 @@ fundiv.table2=left_join(fundiv.table, meta.table2)
 rich.plot=ggplot(meta.div2, aes(leaf_age_weeks, log(richness))) + 
   geom_jitter(size=3, color='black', shape=21, aes( fill=treatment))+  
   geom_smooth(method='gam', se=FALSE, color='black', linetype='dashed') + 
-  ylab('log(ASV richness') + xlab('Leaf age (weeks)')  + 
+  ylab('log(ASV richness)') + xlab('Leaf age (weeks)')  + 
   xlab('') + Theme2 + scale_fill_manual(values=c('black', 'white')) + 
   theme(legend.position = 'none') +
   annotate('text', x=0, y=5.5, label='a.')
