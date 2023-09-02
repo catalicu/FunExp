@@ -1,0 +1,129 @@
+---
+title: "qPCR processing for FunExp"
+output: html_document
+date: "2023-03-07"
+---
+
+# Set up and Load data
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Load libraries
+```{r}
+library(ggplot2)
+library(dplyr)
+library(gridExtra)
+library(car)
+```
+## Plot themes
+```{r}
+# with legend
+Theme=theme_classic(base_size=11, base_family="Helvetica") +
+  theme(axis.line = element_line(size = 1, colour = "black", linetype = "solid")) +theme(plot.title = element_text(size = 12))
+# without legend
+Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fill=NA))
+```
+
+## Data
+Data from qPCR: load and process.
+```{r}
+qPCR_data1=read.csv('input_data/qPCR/FunEx1_calculations.csv', header=TRUE)
+qPCR_data2=read.csv('input_data/qPCR/FunEx2_calculations.csv', header=TRUE)
+# merge
+qPCR_dataAll=rbind(qPCR_data1, qPCR_data2)
+# specify class
+qPCR_dataAll$age=as.numeric(qPCR_dataAll$age)
+# make column with sample name
+qPCR_dataAll$sample_name=paste(qPCR_dataAll$agetreatment, qPCR_dataAll$treatment, qPCR_dataAll$replicates, sep='_')
+```
+
+Identify and remove outliers.
+Outliers defined as higher than 2* 10^6 copies.
+```{r}
+qPCR_clean=qPCR_dataAll[-which(qPCR_dataAll$Quantity>2000000),]
+```
+
+# Analysis
+Focus on 2 relationships:
+* gene copy abundance and leaf age
+* gene copy abundance and diversity
+* gene copy abundance and function
+
+## gene counts vs leaf age
+If bacterial abundance changes dramatically with leaf age, functional activity and bacterial diversity may be impacted by abundance alone. 
+
+### Plot
+```{r}
+plot_qpcrage=ggplot(qPCR_clean, aes(age, log(Quantity+1))) + geom_jitter() + Theme2 +
+  xlab('leaf age (weeks)') + ylab('log(16S rRNA gene copy number +1)') + 
+  annotate('text', x=1, y=14, label='a. ')
+```
+
+### Test for statistical differences:
+```{r}
+# anova neg but does not seem normally distributed
+qPCR_Funexp_anova=aov(log(Quantity+1)~age, data=qPCR_clean)
+summary(qPCR_Funexp_anova)
+shapiro.test(residuals(qPCR_Funexp_anova))
+qqplot(predict(qPCR_Funexp_anova), residuals(qPCR_Funexp_anova))
+
+# non parametric
+kruskal.test(log(Quantity+1)~age, data=qPCR_clean)
+```
+
+glm version
+```{r}
+qPCR_Funexp_mod=lm(log(Quantity+1)~age, data=qPCR_clean)
+summary(qPCR_Funexp_mod)
+Anova(qPCR_Funexp_mod)
+
+```
+
+## gene abundance vs species diversity
+Load diveristy data:
+```{r}
+ASVtable.fundiv=read.table('input_data/ASVtable_forGLM_FunExp12023-01-04.txt', header=TRUE)
+metatable=ASVtable.fundiv[,1377:1394]
+metatable2=metatable[-which(is.na(metatable$Tube_name)),]
+metatable2$sample_name=paste(metatable2$leaf_age, metatable2$treatment, metatable2$replicates, sep='_')
+meta_qPCR=left_join(metatable2, qPCR_clean)
+
+meta_qPCR_clean=meta_qPCR[-which(is.na(meta_qPCR$Quantity)),]
+
+```
+
+### plot
+
+```{r}
+plot_qpcrrich=ggplot(meta_qPCR_clean, aes((Quantity), richness)) + geom_point() + Theme2 +annotate('text', x=-0.5, y=100, label='b.') + xlab('16S rRNA gene copy number') +
+  ylab('ASV richness') 
+```
+
+### statistics
+glm version - stat test
+```{r}
+qPCRrichness_mod=lm(richness~(Quantity+1), data=meta_qPCR_clean)
+summary(qPCRrichness_mod)
+```
+
+## gene abundance vs function
+### plot
+```{r}
+plot_qpcrFun=ggplot(data=meta_qPCR_clean, aes(x=Quantity, y=W_Change)) + geom_point() + Theme2 + annotate('text', x=-0.5, y=0.030, label='c.') + xlab('16S rRNA gene copy number') +
+  ylab('Weight change (g)')
+```
+### stats
+glm version - stat test
+```{r}
+qPCRFun_mod=lm(W_Change~(Quantity+1), data=meta_qPCR_clean)
+summary(qPCRFun_mod)
+
+```
+
+## Merge plots
+```{r}
+library(gridExtra)
+grid.arrange( plot_qpcrage, plot_qpcrrich, plot_qpcrFun, ncol=3)
+```
+

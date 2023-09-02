@@ -41,7 +41,7 @@ mod.TAO=lm(W_Change~(richness), data=fundiv.table_BEF[which(fundiv.table_BEF$tre
 BEFmain_fig= ggplot(fundiv.table_BEF, aes(log(richness), W_Change)) + geom_jitter(color='black',shape=21, aes(size=leaf_age_weeks, fill=treatment))+ Theme2 + xlab('log(number of ASV)') + ylab('Weight change (g)') + scale_fill_manual(values=c('black','white')) 
 quartz(height=4, width=4.5)
 plot(BEFmain_fig)
-quartz.save('Fig_BEFmain.png', type='png', dpi=300)
+quartz.save('Figures/Fig_BEFmain.png', type='png', dpi=300)
 
 
 ### stats
