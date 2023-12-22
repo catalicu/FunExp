@@ -7,11 +7,11 @@ To better understand how ASV richness and degradation change with leaf age, we b
 Fig_AGEvs_aDiv_bFun.R and Stat_AGEvs_aDiv_bFun.R. We repeated this analysis while removing the oldest leaves to assess their role in 
 Fig_time_fun_noold.R in stats_FunAge_noOld. 
 
-*Controls*
+**Controls**  
 To establish the diversity and function baselines before running the degradation experiment, we built a Fig_DivBaseline.R. 
 We assessed bacterial abundance using qPCR on the 16S rRNA gene and established whether abundance influences diversity and/or function in qPCR_FunExp.R.  
 
-*Overal projects* 
+**Overal projects**   
 FunASV_v11.Rmd
 FunExp.Rproj
 
