@@ -50,21 +50,15 @@ Baseline2$w_richness=Baseline2$richness/Baseline2$count
 
 # plot richness panels
 rich_regional=ggplot(Baseline, aes(leaf_age_weeks, richness))  + 
-  geom_point(size=2)+ Theme + ylab('Richness') + 
+  geom_point(size=2)+ Theme + ylab('ASV Richness') + 
   xlab('Leaf age (weeks)') + 
   geom_smooth(method=lm, formula=y ~ (x), se=FALSE, color='black', size=0.5) + 
   annotate('text', label='a.', x=1, y=115)
 rich_local=ggplot(Baseline2, aes(leaf_age_weeks, w_richness))  + 
-  geom_point(size=2)+ Theme + ylab('Weighted Richness per leaf') + 
+  geom_point(size=2)+ Theme + ylab('Weighted ASV Richness per leaf') + 
   xlab('Leaf age (weeks)') + 
   geom_smooth(method='lm', formula= y ~ (x), se=FALSE, color='black', size=0.5)+ 
   annotate('text', label='b.', x=1, y=4)
-
-
-Fig_divControl=arrangeGrob(rich_regional, rich_local, ncol=2)
-quartz(width=6, height=3)
-plot(Fig_divControl)
-quartz.save('Figures/Fig_div_time_controls.png', type='png', dpi=300)
 
 # stats
 # rich regional
@@ -82,14 +76,15 @@ Anova(model_baseline2a) # wald test
 ### repeat for evenness
 # plot evenness panels
 eve_regional=ggplot(Baseline, aes(leaf_age_weeks, evenness))  + 
-  geom_point(size=2)+ Theme + ylab('Richness') + 
+  geom_point(size=2)+ Theme + ylab('Evenness') + 
   xlab('Leaf age (weeks)') + 
   geom_smooth(method=lm, formula=y ~ (x), se=FALSE, color='black', size=0.5) + 
-  annotate('text', label='a.', x=0.8, y=0.7)
+  annotate('text', label='c.', x=0.8, y=0.7)
 
-
-plot(eve_regional)
-quartz.save('Figures/Fig_eve_time_controls_supmat.png', type='png', dpi=300)
+Fig_divControl=arrangeGrob(rich_regional, rich_local, eve_regional, ncol=2)
+quartz(width=6, height=6)
+plot(Fig_divControl)
+quartz.save('Figures/Fig_div_time_baselinecontrols.png', type='png', dpi=300)
 
 # stats
 # eve regional
