@@ -1,7 +1,6 @@
 # FunExp
 Code that supports figures and stats from FunExp project.
 
-
 ## Contents and narrative
 The central figure in this study depicts the relationship betwen ASV richness and Degradation, as they demonstrate a negative diversity - function relationship. [BEF_funexp_main.R](https://github.com/catalicu/FunExp/blob/main/BEF_funexp_main.R) contains the figure and stats to represent this relationship. The stats include model selection as conducted in [Stat_BEFmain_models.R](https://github.com/catalicu/FunExp/blob/main/Stat_BEFmain_models.R).
 To better understand how ASV richness and degradation change with leaf age, we built figures representing this diversity in 
