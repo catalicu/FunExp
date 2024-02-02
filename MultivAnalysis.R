@@ -94,8 +94,7 @@ for(g in levels(NMDS.table$group)){
   #g='A10'
   df_ell <- rbind(df_ell, cbind(as.data.frame(with(NMDS.table[NMDS.table$group==g,],
                                                    veganCovEllipse(cov.wt(cbind(NMDS1,NMDS2),wt=rep(1/length(NMDS1),length(NMDS1)))$cov,center=c(mean(NMDS1),mean(NMDS2)))))
-                                ,group=g))
-}
+                                ,group=g)}
 
 ggplot(data = NMDS.table, aes(NMDS1, NMDS2)) + geom_point(size=3,shape=21, aes(fill=(group))) +
   geom_path(data=df_ell, aes(x=NMDS1, y=NMDS2,colour=group), size=0.5, linetype=2)+
@@ -103,8 +102,10 @@ ggplot(data = NMDS.table, aes(NMDS1, NMDS2)) + geom_point(size=3,shape=21, aes(f
   ggtitle('automatic colors')
 
 ggplot(meta.table2.nmds, aes(NMDS1, NMDS2)) + 
-  geom_point(size=3, aes(fill=(leaf_age_weeks), shape=treatment)) + Theme + 
-  scale_shape_manual(values=c(21,22)) +scale_fill_gradient(low='blue', high='red') + 
+  geom_point(size=3, aes(fill=factor(leaf_age_weeks), shape=treatment)) + Theme + 
+  scale_shape_manual(values=c(21,22)) +#scale_fill_gradient(low='blue', high='red') + 
   geom_path(data=df_ell, aes(x=NMDS1, y=NMDS2,colour=group), size=0.5, linetype=2) + 
   annotate("text",x=NMDS.mean$NMDS1,y=NMDS.mean$NMDS2,label=NMDS.mean$group, size=2) +
-  ggtitle('color formatting from first figure')
+  scale_fill_manual(values=c('black', 'dark blue', 'light blue', 'dark green', 'green', 'yellow', 'orange', 'red')) +
+  scale_color_manual(values=c('black', 'dark blue', 'light blue', 'dark green', 'green', 'yellow', 'orange', 'red'))
+  
