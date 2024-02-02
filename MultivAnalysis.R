@@ -58,33 +58,18 @@ ASVtable2=ASVtable[-c(
   which(meta.table$treatment=='TAI_control'), 
   which(meta.table$treatment=='TAO_control')
 ),]
-data.frame(dim(ASVtable), dim(ASVtable2)) # check that the column was eliminated by looking at the dimensions of the datasets
-
-# identify and remove taxa with 10 or fewer abundances. 
-# these may have appeared in controls or removed samples.
-ASVtable2.t=t(ASVtable2)
-class(ASVtable2.t)
-
-ASVtable2.t.n=data.frame(ASVtable2.t)
-
-list.row.low=which(rowSums(ASVtable2.t.n)<=10)
-length(list.row.low)
-
-ASVtable2.t.wtzero=ASVtable2.t[-c(list.row.low), ]
-range(rowSums(ASVtable2.t.wtzero))
-
-data.frame(dim(ASVtable2.t), dim(ASVtable2.t.wtzero)) # generate table that portrays how many taxa were removed.
-length(rowSums(ASVtable2.t.wtzero))
+data.frame(dim(ASVtable), dim(ASVtable2)) 
+# check that the column was eliminated by looking at the dimensions of the datasets
 
 # perMANOVA
-adonis1=adonis2(ASVtable2.t.wtzero~leaf_age_weeks*treatment, data=meta.table2) 
+adonis1=adonis2(ASVtable2~leaf_age_weeks*treatment, data=meta.table2) 
 (adonis1)
 adonis2=adonis2(ASVtable2.t.wtzero~leaf_age_weeks, data=meta.table2) 
 (adonis2)
 
 # calculate NMDS scores per sample
-NMDS.mod1=metaMDS(ASVtable2.t.wtzero, k=3, distance ='bray', trymax = 50)
-meta.table2.nmds=data.frame(meta.table2, scores(NMDS.mod1))
+NMDS.mod1=metaMDS(ASVtable2, k=3, distance ='bray', trymax = 50)
+meta.table2.nmds=data.frame(meta.table2, scores(NMDS.mod1)$sites)
 
 ## ordielipse function
 veganCovEllipse<-function (cov, center = c(0, 0), scale = 1, npoints = 100) 
@@ -95,11 +80,13 @@ veganCovEllipse<-function (cov, center = c(0, 0), scale = 1, npoints = 100)
 }
 
 ## plot NMDS - simple
-ggplot(meta.table3.nmds, aes(NMDS1, NMDS2)) + geom_point(size=3, aes(fill=(leaf_age_weeks), shape=treatment)) + Theme + scale_shape_manual(values=c(21,22)) +scale_fill_gradient(low='blue', high='red') 
+ggplot(meta.table2.nmds, aes(NMDS1, NMDS2)) + geom_point(size=3, aes(fill=(leaf_age_weeks), shape=treatment)) + Theme + scale_shape_manual(values=c(21,22)) +scale_fill_gradient(low='blue', high='red') 
 
 ## plot NMDS - with ordiellipses
 # Prepare for the ordihull
-NMDS.table = data.frame(NMDS1 = meta.table3.nmds$NMDS1, NMDS2 = meta.table3.nmds$NMDS2,group=factor(meta.table3.nmds$leaf_age))
+NMDS.table = data.frame(NMDS1 = meta.table2.nmds$NMDS1, 
+                        NMDS2 = meta.table2.nmds$NMDS2,
+                        group=factor(meta.table2.nmds$leaf_age))
 NMDS.mean=aggregate(NMDS.table[,1:2],list(group=NMDS.table$group),mean)
 df_ell <- data.frame()
 
@@ -115,7 +102,9 @@ ggplot(data = NMDS.table, aes(NMDS1, NMDS2)) + geom_point(size=3,shape=21, aes(f
   annotate("text",x=NMDS.mean$NMDS1,y=NMDS.mean$NMDS2,label=NMDS.mean$group, size=2) + Theme + 
   ggtitle('automatic colors')
 
-ggplot(meta.table3.nmds, aes(NMDS1, NMDS2)) + 
+ggplot(meta.table2.nmds, aes(NMDS1, NMDS2)) + 
   geom_point(size=3, aes(fill=(leaf_age_weeks), shape=treatment)) + Theme + 
   scale_shape_manual(values=c(21,22)) +scale_fill_gradient(low='blue', high='red') + 
-  geom_path(data=df_ell, aes(x=NMDS1, y=NMDS2,colour=group), size=0.5, linetype=2) + annotate("text",x=NMDS.mean$NMDS1,y=NMDS.mean$NMDS2,label=NMDS.mean$group, size=2) + ggtitle('color formatting from first figure')
+  geom_path(data=df_ell, aes(x=NMDS1, y=NMDS2,colour=group), size=0.5, linetype=2) + 
+  annotate("text",x=NMDS.mean$NMDS1,y=NMDS.mean$NMDS2,label=NMDS.mean$group, size=2) +
+  ggtitle('color formatting from first figure')
