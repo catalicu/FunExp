@@ -7,6 +7,7 @@
 library(ggplot2)
 library(vegan)
 library(plyr)
+library(dplyr)
 library(lme4)
 library(nlme)
 library(gridExtra)
@@ -104,3 +105,15 @@ ggplot(meta.table2.nmds, aes(NMDS1, NMDS2)) +
   scale_fill_manual(values=c('black', 'dark blue', 'light blue', 'dark green', 'green', 'yellow', 'orange', 'red')) +
   scale_color_manual(values=c('black', 'dark blue', 'light blue', 'dark green', 'green', 'yellow', 'orange', 'red')) 
   
+
+# Plot nmds against function:
+## import the function data and merge with the metadata table
+fun.table=read.table('input_data/FunExp_metadata.txt', header=TRUE)
+colnames(fun.table)[3]=  colnames(meta.table2.nmds)[2]
+funmeta.table=left_join(fun.table, meta.table2.nmds)
+funmeta.table2=funmeta.table[-which(is.na(funmeta.table[,10])),]
+
+ggplot(funmeta.table2, aes(x=NMDS1, y=W_Change)) + geom_point(aes(color=factor(leaf_age_weeks))) + Theme
+ggplot(funmeta.table2, aes(x=NMDS2, y=W_Change)) + geom_point(aes(color=factor(leaf_age_weeks))) + Theme
+
+# no significant trends - ignore
