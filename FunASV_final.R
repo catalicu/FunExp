@@ -4,15 +4,15 @@
 
 # Libraries
 library(ggplot2)
-library(vegan)
+#library(vegan)
 library(dplyr)
-library(plyr)
-library(lme4)
-library(nlme)
-library(gridExtra)
+#library(plyr)
+#library(lme4)
+#library(nlme)
+#library(gridExtra)
 library(reshape2)
-library(car)
-library(MASS)
+#library(car)
+#library(MASS)
 
 # Plot themes
 ## With legend
@@ -110,17 +110,11 @@ IterativeGLM_Fun <- function(ASVfun, taxatable){
   return(model.results.output.glmFun)
 }
 
-# run the function
-## with all ASVs
+# run the function with all ASVs
 model.results.trial1=IterativeGLM_Fun(ASVtable.fundiv1, taxatable)
-### clean and save the tables
+### clean the tables
 models.coefficients1 = model.results.trial1$coefficients
 models.evals1 = model.results.trial1$evaluation
-#glm.models.coeff = paste(outPATH, 'ASV_glm_coefficients_FunExp1', date,'.txt', sep='')
-#glm.models.evals = paste(outPATH, 'ASV_glm_evals_FunExp1', date,'.txt', sep='')
-  #write.table(models.coefficients1, glm.models.coeff, sep="\t")
-  #write.table(models.evals1, glm.models.evals, sep="\t")
-
 
 # sort the output tables
 ## create lists to store potential ASVs correlated with function
@@ -169,7 +163,6 @@ for (i in 1:length(ASVfun_names)){
   }
 }
 
-
 #### Edit the sorted tables and save
 #Change from matrix to data frame and add column names.
 #Focus on negative and positive slopes from here on. 
@@ -196,6 +189,7 @@ list_asv_noslope.Fun.df=data.frame(list_asv_noslope.Fun)
     data.frame(Slope=rep('Neutral',dim(listnoslope.rank_taxa)[1]), listnoslope.rank_taxa),
     data.frame(Slope=rep('Negative',dim(listNeg.rank_taxa)[1]), listNeg.rank_taxa))
 
+  ######
 # prepare dataset
   # select the columns that will go into the long format:
   # include treatment, leaf age, and taxa that were realted to function
