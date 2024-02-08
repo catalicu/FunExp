@@ -113,7 +113,20 @@ colnames(fun.table)[3]=  colnames(meta.table2.nmds)[2]
 funmeta.table=left_join(fun.table, meta.table2.nmds)
 funmeta.table2=funmeta.table[-which(is.na(funmeta.table[,10])),]
 
-ggplot(funmeta.table2, aes(x=NMDS1, y=W_Change)) + geom_point(aes(color=factor(leaf_age_weeks))) + Theme
-ggplot(funmeta.table2, aes(x=NMDS2, y=W_Change)) + geom_point(aes(color=factor(leaf_age_weeks))) + Theme
+divfun_sup_nmdsplo1=ggplot(funmeta.table2, aes(x=NMDS1, y=W_Change)) + 
+  geom_point(aes(color=factor(leaf_age_weeks))) + Theme2 + ylab('Weigth loss (g)') +
+  scale_color_manual(values=c('black', 'dark blue', 'light blue', 'dark green', 'green', 'yellow', 'orange', 'red')) 
+
+
+divfun_sup_nmdsplot2=ggplot(funmeta.table2, aes(x=NMDS2, y=W_Change)) + 
+  geom_point(aes(color=factor(leaf_age_weeks))) + Theme2 + ylab('Weigth loss (g)') +
+  scale_color_manual(values=c('black', 'dark blue', 'light blue', 'dark green', 'green', 'yellow', 'orange', 'red')) 
+
+quartz(width=7.5, height=3.5)
+grid.arrange(divfun_sup_nmdsplo1, divfun_sup_nmdsplot2, ncol=2)
+quartz.save('/Figures/FigS4_NMDSaxis.pdf')
+
+summary(lm(W_Change ~ NMDS1 * leaf_age_weeks, data=funmeta.table2))
+summary(lm(W_Change ~ NMDS2 * leaf_age_weeks, data=funmeta.table2))
 
 # no significant trends - ignore
