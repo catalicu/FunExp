@@ -26,17 +26,19 @@ ASVtable.fundiv=read.table('input_data/ASVtable_forGLM_FunExp12023-01-04.txt', h
 ASVtable.fundiv1=ASVtable.fundiv[,-1]
 taxatable=read.table('input_data/taxtable_FunExp12023-01-04.txt', header=TRUE)
 
+# list of ASV codes to go through:
+ASVfun_names=names(ASVtable.fundiv1)[1:1375]
+
 # from FunASV_v8: create an iterative GLM function
 ## ### To Iterate the GLM:
-
-#* glm (gaussian distribution) vs null model
-#* Store the model's outputs and the comparison with the null. 
+# * glm (gaussian distribution) vs null model
+# * Store the model's outputs and the comparison with the null. 
 
 #Input:
-#* wide format dataset with ASV, fundiv data: ASVtable.fundiv1
-#* list of taxa with number, DNA sequence, taxonomic affiliation and organized from more abundant to least abundant: taxatable
-
-IterativeGLM_Fun <- function(ASVfun, taxatable){
+# * ASVfun = wide format dataset with ASV, fundiv data: ASVtable.fundiv1
+# * taxatable = list of taxa with number, DNA sequence, taxonomic affiliation and organized from more abundant to least abundant: taxatable
+# * minocc = minimum number of occurrences for taxa to be run through the model
+IterativeGLM_Fun <- function(ASVfun, taxatable, minocc){
   ASVfun_names=names(ASVfun)[1:1375]
   # create objects to store model results
   model.glmFun.results=c() # store model coefficients and output
@@ -49,7 +51,7 @@ IterativeGLM_Fun <- function(ASVfun, taxatable){
     # skip columns with 0 to 4 appearances
     ASVdataFun_presence=ASVdataFun[1]
     ASVdataFun_presence[which(ASVdataFun_presence>1),]=1
-    if (sum(ASVdataFun_presence)<5) {print('low occurrence (<2)')} else {
+    if (sum(ASVdataFun_presence)<minocc) {print(paste('low occurrence (<)',minocc))} else {
       
       tax_rownum=which(taxatable$ASVcode==ASVfun_names[i])
       
@@ -110,32 +112,39 @@ IterativeGLM_Fun <- function(ASVfun, taxatable){
   return(model.results.output.glmFun)
 }
 
-# run the function with all ASVs
-model.results.trial1=IterativeGLM_Fun(ASVtable.fundiv1, taxatable)
-### clean the tables
-models.coefficients1 = model.results.trial1$coefficients
-models.evals1 = model.results.trial1$evaluation
+# run the function by keeping:
+  # taxa in 0.14% of samples - 2 occurrences or more - does not run well, low abundances
+#model.results.trial1=IterativeGLM_Fun(ASVtable.fundiv1, taxatable,2)
+  # taxa in 0.35% of samples - 5 occurrences or more
+model.results.trial5=IterativeGLM_Fun(ASVtable.fundiv1, taxatable,5)
+  # taxa in 0.71% of samples - 10 occurrences or more
+model.results.trial10=IterativeGLM_Fun(ASVtable.fundiv1, taxatable,10)
+  # taxa in 1% of samples - 15 occurrences or more
+model.results.trial15=IterativeGLM_Fun(ASVtable.fundiv1, taxatable,15)
+
+
 
 # sort the output tables
-## create lists to store potential ASVs correlated with function
-list_asv_slopePos.Fun=c()
-list_asv_noslope.Fun=c()
-list_asv_slopeNeg.Fun=c()
-
-# list of ASV codes to go through:
-ASVfun_names=names(ASVtable.fundiv1)[1:1375]
+# Input:
+# * ASVfun_names = ASV names (codes), the function will go one by one
+# * models.coefficients = the coefficient output of iterativeGLM function
+SortingASVtables=function(ASVfun_names, models.coefficients){
+  ## create lists to store potential ASVs correlated with function
+    list_asv_slopePos.Fun=c()
+    list_asv_noslope.Fun=c()
+    list_asv_slopeNeg.Fun=c()
 
 for (i in 1:length(ASVfun_names)){
   # check that the ASV is present in the dataset
-  if (sum(which(models.coefficients1$ASVcode==ASVfun_names[i]))==0) { print(paste(ASVfun_names[i], 'ASV not found'))
+  if (sum(which(models.coefficients$ASVcode==ASVfun_names[i]))==0) { print(paste(ASVfun_names[i], 'ASV not found'))
   } else {
     
     # extract the slope estimate:
-    ASVabund.estimate= models.coefficients1[which(models.coefficients1$ASVcode==ASVfun_names[i]),1][2]
+    ASVabund.estimate= models.coefficients[which(models.coefficients$ASVcode==ASVfun_names[i]),1][2]
     # extract the p value:
-    ASVabund.p= models.coefficients1[which(models.coefficients1$ASVcode==ASVfun_names[i]),5][2]
-    ASVcode= models.coefficients1[which(models.coefficients1$ASVcode==ASVfun_names[i]),8][2]
-    ASVGenus= models.coefficients1[which(models.coefficients1$ASVcode==ASVfun_names[i]),6][2]
+    ASVabund.p= models.coefficients[which(models.coefficients$ASVcode==ASVfun_names[i]),5][2]
+    ASVcode= models.coefficients[which(models.coefficients$ASVcode==ASVfun_names[i]),8][2]
+    ASVGenus= models.coefficients[which(models.coefficients$ASVcode==ASVfun_names[i]),6][2]
     
     # inform of progress:  
     print(paste('Progress:', i, ASVcode, ASVGenus))
@@ -188,8 +197,14 @@ list_asv_noslope.Fun.df=data.frame(list_asv_noslope.Fun)
     data.frame(Slope=rep('Positive',dim(listPos.rank_taxa)[1]), listPos.rank_taxa),
     data.frame(Slope=rep('Neutral',dim(listnoslope.rank_taxa)[1]), listnoslope.rank_taxa),
     data.frame(Slope=rep('Negative',dim(listNeg.rank_taxa)[1]), listNeg.rank_taxa))
+  return(ASVslope_sorted)
+}
 
-  ######
+ASVslope_sorted5=SortingASVtables(ASVfun_names, model.results.trial5$coefficients)
+ASVslope_sorted10=SortingASVtables(ASVfun_names, model.results.trial10$coefficients)
+ASVslope_sorted15=SortingASVtables(ASVfun_names, model.results.trial15$coefficients)
+
+######
 # prepare dataset
   # select the columns that will go into the long format:
   # include treatment, leaf age, and taxa that were realted to function
