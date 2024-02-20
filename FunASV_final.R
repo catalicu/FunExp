@@ -2,17 +2,20 @@
 #author: "Dr CG"
 #date:"1/13/2023"
 
+# Description:
+# This script runs iterative GLMs on individual ASVs, performs correction
+# for multiple testing and prints the output in tables that identify 
+# significant slopes and their direction. 
+# It is set up to run two models:
+  # * one with Function (weight loss) ~ ASV abundance 
+  # * one with Function (weight loss) ~ ASV abundance * leaf age
+# *******continue work at Sorting function line 301
+
+
 # Libraries
 library(ggplot2)
-#library(vegan)
 library(dplyr)
-#library(plyr)
-#library(lme4)
-#library(nlme)
-#library(gridExtra)
 library(reshape2)
-#library(car)
-#library(MASS)
 
 # Plot themes
 ## With legend
@@ -223,7 +226,8 @@ model.results_time.trial15=IterativeGLM_Fun_time(ASVtable.fundiv1, taxatable,15)
 # Input:
 # * ASVfun_names = ASV names (codes), the function will go one by one
 # * models.coefficients = the coefficient output of iterativeGLM function
-#models.coefficients=model.results.trial15$coefficients
+models.coefficients=model.results.trial5$coefficients
+
 SortingASVtables=function(ASVfun_names, models.coefficients){
   ## create lists to store potential ASVs correlated with function
     list_asv_slopePos.Fun=c()
@@ -282,16 +286,27 @@ nrow(list_asv_slopeNeg.Fun.df)
   listNeg.rank=list_asv_slopeNeg.Fun.df[order(list_asv_slopeNeg.Fun.df$ASVestimate),]
 
 list_asv_noslope.Fun.df=data.frame(list_asv_noslope.Fun)
+colnames(list_asv_noslope.Fun.df)=c('ASVcode', 'ASVestimate', 'ASVp.value')
 if (nrow(list_asv_noslope.Fun.df)>0) {
-  colnames(list_asv_noslope.Fun.df)=c('ASVcode', 'ASVestimate', 'ASVp.value')
   listnoslope.rank=list_asv_noslope.Fun.df[order(list_asv_noslope.Fun.df$ASVestimate),]
                                     } else {
-                                      list_asv_noslope=rep(NA, 3)
+                                      listnoslope.rank=rbind(rep(NA, 3),rep(NA, 3))
                                     }
+  
+  
 # Merge the lists with their taxonomic affiliations
-  listPos.rank_taxa=left_join(listPos.rank, taxatable)
-  listnoslope.rank_taxa=left_join(listnoslope.rank, taxatable)
-  listNeg.rank_taxa=left_join(listNeg.rank, taxatable)
+if (sum(as.numeric(listPos.rank$ASVestimate))==0) { listPos.rank=rbind(rep(1, 10),rep(1,10))
+      } else {
+  listPos.rank_taxa=left_join(listPos.rank, taxatable)}
+if (is.na(listnoslope.rank[2])) { listnoslope.rank_taxa=rbind(rep(1, 10),rep(1,10)) # this is a problem: if its numerical is.na throws an error, if its na, as.numeric throws an error
+                                  colnames(listnoslope.rank_taxa)=c("ASVcode",  
+                                  "ASVestimate", "ASVp.value", "Kingdom", "Phylum", 
+                                  "Class", "Order","Family","Genus", "ASVseq" )
+      } else {
+  listnoslope.rank_taxa=left_join(listnoslope.rank, taxatable) }
+if (sum(as.numeric(listNeg.rank$ASVestimate))==0) { listNeg.rank=rbind(rep(1, 10),rep(1,10))
+      } else {
+  listNeg.rank_taxa=left_join(listNeg.rank, taxatable)}
   
 # Merge all lists
   ASVslope_sorted=rbind(
