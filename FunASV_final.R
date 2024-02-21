@@ -1,6 +1,7 @@
-#title: "FunExp_v11"
+#title: "FunASV_final.R"
 #author: "Dr CG"
 #date:"1/13/2023"
+# taken from 'FunExp_v11.R'
 
 # Description:
 # This script runs iterative GLMs on individual ASVs, performs correction
@@ -335,3 +336,14 @@ ASVslope_sorted15=SortingASVtables(ASVfun_names, model.results.trial15$coefficie
 ASVslope_sorted_time5=SortingASVtables(ASVfun_names, model.results_time.trial5$coefficients)
 ASVslope_sorted_time10=SortingASVtables(ASVfun_names, model.results_time.trial10$coefficients)
 ASVslope_sorted_time15=SortingASVtables(ASVfun_names, model.results_time.trial15$coefficients)
+
+# summary table:
+data.frame(
+  model=c('basic','basic','basic', 'time', 'time','time'),
+  occurrence=c(5, 10, 15, 5, 10, 15),  
+  NoASV=c(dim(model.results.trial5$evaluation)[1]/2, 
+    dim(model.results.trial10$evaluation)[1]/2, 
+    dim(model.results.trial15$evaluation)[1]/2, 
+    dim(model.results_time.trial5$evaluation)[1]/2, 
+    dim(model.results_time.trial10$evaluation)[1]/2, 
+    dim(model.results_time.trial15$evaluation)[1]/2))
