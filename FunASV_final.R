@@ -20,7 +20,7 @@ library(reshape2)
 # Plot themes
 ## With legend
 Theme=theme_classic(base_size=11, base_family="Helvetica") +
-  theme(axis.line = element_line(size = 1, colour = "black", linetype = "solid")) +theme(plot.title = element_text(size = 12))
+  theme(axis.line = element_line(linewidth = 1, colour = "black", linetype = "solid")) +theme(plot.title = element_text(size = 12))
 ## Without legends
 Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fill=NA))
 
@@ -226,7 +226,7 @@ model.results_time.trial15=IterativeGLM_Fun_time(ASVtable.fundiv1, taxatable,15)
 # Input:
 # * ASVfun_names = ASV names (codes), the function will go one by one
 # * models.coefficients = the coefficient output of iterativeGLM function
-models.coefficients=model.results.trial5$coefficients
+models.coefficients=model.results_time.trial15$coefficients
 
 SortingASVtables=function(ASVfun_names, models.coefficients){
   ## create lists to store potential ASVs correlated with function
@@ -234,6 +234,7 @@ SortingASVtables=function(ASVfun_names, models.coefficients){
     list_asv_noslope.Fun=c()
     list_asv_slopeNeg.Fun=c()
 
+#i=1
 for (i in 1:length(ASVfun_names)){
   # check that the ASV is present in the dataset
   if (sum(which(models.coefficients$ASVcode==ASVfun_names[i]))==0) { print(paste(ASVfun_names[i], 'ASV not found'))
@@ -265,48 +266,57 @@ for (i in 1:length(ASVfun_names)){
           list_asv_slopeNeg.Fun=rbind(list_asv_slopeNeg.Fun, c(ASVfun_names[i], ASVabund.estimate, ASVabund.p))
         } else {
           # store non significant and NA results ASV in noslope list
-          list_asv_noslope.Fun=c(list_asv_noslope.Fun, paste(ASVfun_names[i], ASVabund.estimate, ASVabund.p)) 
+          list_asv_noslope.Fun=rbind(list_asv_noslope.Fun, c(ASVfun_names[i], ASVabund.estimate, ASVabund.p)) 
         }
       } 
     }
   }
 }
 
-#### Edit the sorted tables and save
+#### Edit the sorted tables:
 #Change from matrix to data frame and add column names.
-#Focus on negative and positive slopes from here on. 
 list_asv_slopePos.Fun.df=data.frame(list_asv_slopePos.Fun)
-nrow(list_asv_slopePos.Fun.df)
-  colnames(list_asv_slopePos.Fun.df)=c('ASVcode', 'ASVestimate', 'ASVp.value')
-  listPos.rank=list_asv_slopePos.Fun.df[order(list_asv_slopePos.Fun.df$ASVestimate),]
+if (nrow(list_asv_slopePos.Fun.df)>0) {
+  listPos.rank=list_asv_slopePos.Fun.df[order(list_asv_slopePos.Fun.df[,2]),]
+                                    } else {
+                                      listPos.rank=rbind(c('A000', rep(1, 2)),c('A000', rep(1, 2)))
+                                    }
+colnames(listPos.rank)=c('ASVcode', 'ASVestimate', 'ASVp.value')
 
 list_asv_slopeNeg.Fun.df=data.frame(list_asv_slopeNeg.Fun)
-nrow(list_asv_slopeNeg.Fun.df)
-  colnames(list_asv_slopeNeg.Fun.df)=c('ASVcode', 'ASVestimate', 'ASVp.value')
-  listNeg.rank=list_asv_slopeNeg.Fun.df[order(list_asv_slopeNeg.Fun.df$ASVestimate),]
+if (nrow(list_asv_slopeNeg.Fun.df)>0) {  
+  listNeg.rank=list_asv_slopeNeg.Fun.df[order(list_asv_slopeNeg.Fun.df[,2]),]
+                                    } else {
+                                      listNeg.rank=rbind(c('A000', rep(1, 2)),c('A000', rep(1, 2)))
+                                    }
+colnames(listNeg.rank)=c('ASVcode', 'ASVestimate', 'ASVp.value')
 
 list_asv_noslope.Fun.df=data.frame(list_asv_noslope.Fun)
-colnames(list_asv_noslope.Fun.df)=c('ASVcode', 'ASVestimate', 'ASVp.value')
 if (nrow(list_asv_noslope.Fun.df)>0) {
-  listnoslope.rank=list_asv_noslope.Fun.df[order(list_asv_noslope.Fun.df$ASVestimate),]
+  listnoslope.rank=list_asv_noslope.Fun.df[order(list_asv_noslope.Fun.df[,2]),]
                                     } else {
-                                      listnoslope.rank=rbind(rep(NA, 3),rep(NA, 3))
+                                      listnoslope.rank=rbind(c('A000', rep(1, 2)),c('A000', rep(1, 2)))
                                     }
-  
+colnames(listnoslope.rank)=c('ASVcode', 'ASVestimate', 'ASVp.value')
   
 # Merge the lists with their taxonomic affiliations
-if (sum(as.numeric(listPos.rank$ASVestimate))==0) { listPos.rank=rbind(rep(1, 10),rep(1,10))
+if (sum(as.numeric(listPos.rank[,2]))==2) { listPos.rank=data.frame(listPos.rank)
+      } else { 
+        listPos.rank=listPos.rank  
+      }
+  listPos.rank_taxa=left_join(listPos.rank, taxatable)
+
+if (sum(as.numeric(listnoslope.rank[,2]))==2) { listnoslope.rank=data.frame(listnoslope.rank)
       } else {
-  listPos.rank_taxa=left_join(listPos.rank, taxatable)}
-if (is.na(listnoslope.rank[2])) { listnoslope.rank_taxa=rbind(rep(1, 10),rep(1,10)) # this is a problem: if its numerical is.na throws an error, if its na, as.numeric throws an error
-                                  colnames(listnoslope.rank_taxa)=c("ASVcode",  
-                                  "ASVestimate", "ASVp.value", "Kingdom", "Phylum", 
-                                  "Class", "Order","Family","Genus", "ASVseq" )
+        listnoslope.rank=listnoslope.rank
+      }
+  listnoslope.rank_taxa=left_join(listnoslope.rank, taxatable) 
+  
+if (sum(as.numeric(listNeg.rank[,2]))==2) { listNeg.rank=data.frame(listNeg.rank)
       } else {
-  listnoslope.rank_taxa=left_join(listnoslope.rank, taxatable) }
-if (sum(as.numeric(listNeg.rank$ASVestimate))==0) { listNeg.rank=rbind(rep(1, 10),rep(1,10))
-      } else {
-  listNeg.rank_taxa=left_join(listNeg.rank, taxatable)}
+  listNeg.rank=listNeg.rank
+      }
+  listNeg.rank_taxa=left_join(listNeg.rank, taxatable)
   
 # Merge all lists
   ASVslope_sorted=rbind(
