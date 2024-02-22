@@ -347,3 +347,12 @@ data.frame(
     dim(model.results_time.trial5$evaluation)[1]/2, 
     dim(model.results_time.trial10$evaluation)[1]/2, 
     dim(model.results_time.trial15$evaluation)[1]/2))
+
+# Write tables:
+date=Sys.Date()
+write.table(model.results.trial5$coefficients, paste('output_tables/model.results.trial5_coefficients', date, '.txt', sep=''), sep="\t")
+write.table(model.results.trial5$evaluation, paste('output_tables/model.results.trial5_evaluation', date, '.txt', sep=''), sep="\t")
+write.table(model.results_time.trial5$coefficients, paste('output_tables/model.results_time.trial5_coefficients', date, '.txt', sep=''),sep="\t")
+write.table(model.results_time.trial5$evaluation, paste('output_tables/model.results_time.trial5_evaluation', date, '.txt', sep=''),sep="\t")
+write.table(ASVslope_sorted5, paste('output_tables/ASVslope_sorted5', date, '.txt', sep=''), sep="\t")
+write.table(ASVslope_sorted_time5, paste('output_tables/ASVslope_sorted_time5', date, '.txt', sep=''),sep="\t")
