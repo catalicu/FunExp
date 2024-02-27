@@ -13,6 +13,7 @@
 # Libraries
 library(ggplot2)
 library(dplyr)
+library(plyr)
 library(reshape2)
 
 # Plot themes
@@ -34,8 +35,8 @@ ASVtable=ASVtable.fundiv[,2:1376]
 ## metadata exclusive
 metatable=ASVtable.fundiv[,1377:1394]
 
-
-# from v10 (unedited:
+# prep table for Fig6c
+# from v10:
 ### Calculate: mean abundance, occurrence and mean functional output per ASV
 
 #presence absence: occurrence
@@ -74,26 +75,31 @@ ASVrel.abund.pa.fun.sorted=left_join(ASVrel.abund.pa.fun, ASVslope_sorted)
 ASVrel.abund.pa.fun.sorted[which(is.na(ASVrel.abund.pa.fun.sorted$Slope)),6]='Undetermined'
 
 # Save this table:
-write.table(ASVrel.abund.pa.fun.sorted, file='output_tables/ASVrel.abund.pa.txt', sep='\t')
+#write.table(ASVrel.abund.pa.fun.sorted, file='output_tables/ASVrel.abund.pa.txt', sep='\t')
 
 ASVrel.abund.pa_plot_c=ggplot(ASVrel.abund.pa.fun.sorted, aes(log(ASVrel.abund), ASVpa.freq)) + 
   geom_point(aes(fill=Slope), size=3, shape=21) + Theme +ggtitle('Relationship between ASV occupancy (frequency) and relative abundance') + scale_fill_manual(values=c('black', 'grey', 'white', 'blue')) + ylab('ASV occurrence') + xlab('ASV Relative Abundance')
 
+
+# prep table for Fig6a and b
+# from vXXX:
+### Melt the abundance data set into a long format
+
 # Before melting, reduce the dataset to taxa that we were able to relate to function (in scritp v8)
 # select the columns that will go into the long format:
 # include treatment, leaf age, and taxa that were realted to function
-ASVfor_melt=ASVtable.fundiv[,c(which(colnames(ASVtable.fundiv)%in%(ASVslope_sorted$ASVcode)),1377:1394)]
+ASVfor_melt=ASVtable.fundiv[,c(which(colnames(ASVtable.fundiv)%in%(ASVslope_sorted$ASVcode)),c(1381,1385,1394))]
 # Then use melt to go from the wide table format to the long table format. 
-otumelt_fun.div=melt(ASVfor_melt)
+otumelt_fun.div=melt(ASVfor_melt, id.vars = c('TA_treat', 'W_Change', 'leaf_age_weeks2'), value.name='relative_abundance')
 length(names(otumelt_fun.div))
-names(otumelt_fun.div)=c('leaf_age_weeks2',"ASVcode", "Abundance") # the last two columns will represent the ASV code an the abundance value 
+names(otumelt_fun.div)[4]="ASVcode" 
 head(otumelt_fun.div)
 
 #Clean the tax table to add tax information to the long version of the ASV table with metadata (otumelt)
 otumelt2.div=left_join(otumelt_fun.div, taxatable,  by='ASVcode')
 
 # make sure the relative abundance column is numeric
-otumelt2.div$Abundance=as.numeric(as.character(otumelt2.div$Abundance))
+otumelt2.div$relative_abundance=as.numeric(as.character(otumelt2.div$relative_abundance))
 
 
 #### Generate list of ASVs with taxonomic and abundance data
@@ -103,13 +109,16 @@ otumelt2.div$Abundance=as.numeric(as.character(otumelt2.div$Abundance))
 ASVlist.div=unique(otumelt2.div$ASVcode)	#866 taxa
 
 # calculate means for abundance per taxon
-ASVlist_means.div=ddply(otumelt2.div, .(ASVcode), summarize,  Abund=mean(Abundance, na.rm=TRUE))
+ASVlist_means.div=ddply(otumelt2.div, .(ASVcode), summarize,  Abund=mean(relative_abundance, na.rm=TRUE))
 ASVlist_means.div=ASVlist_means.div[order(ASVlist_means.div$Abund, decreasing=TRUE),]
 ASVlist2.div=left_join(ASVlist_means.div, taxatable)
 
 #### Do the most abundant taxa increase over time?
 otumelt2_ASV1.div=otumelt2.div[which(otumelt2.div$ASVcode=='ASV1'),]
-ggplot(otumelt2_ASV1.div, aes(richness, (Abundance+1))) + geom_point() + geom_smooth(method='lm', se=FALSE, color='black')
+ggplot(otumelt2_ASV1.div, aes(leaf_age_weeks2, (relative_abundance+1))) + 
+  geom_point() + geom_smooth(method='lm', se=FALSE, color='black') +
+  Theme + annotate('text', x=1, y=150000, label='b.')
+
 
 #### Are there general trends of taxa over time?
 ggplot(otumelt2.div, aes(richness, log(Abundance+1))) + geom_jitter(aes(color=ASVcode), alpha=0.4)  + geom_smooth(method='lm', se=FALSE, color='black') + theme(legend.position='none') + geom_smooth(method='lm', aes(color=ASVcode), se=FALSE)
