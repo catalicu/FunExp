@@ -39,15 +39,19 @@ metatable=ASVtable.fundiv[,1377:1394]
 # from v10:
 ### Calculate: mean abundance, occurrence and mean functional output per ASV
 
-#presence absence: occurrence
+# presence absence: occurrence
 ASVpa=ASVtable
 ASVpa[(ASVpa!=0)]=1
 ASVpa=data.frame(ASVpa)
 ASVpa=sapply(ASVpa, as.numeric)
 ASVpa.freq=colSums(ASVpa)/(dim(ASVpa)[1])
 
-#relative abundance
+# relative abundance
 ASVrel.abund=colSums(ASVtable)
+
+# functional ratios:
+ASVtable.FunRat=metatable$W_Change/(ASVtable+1)
+ASVfunRat=colSums(ASVtable.FunRat, na.rm=TRUE)
 
 ### Combine these values into a table
 
@@ -66,7 +70,7 @@ ASVrel.abund.pa[which(ASVrel.abund.pa$ASVrel.abund>1000000),3]='Most Frequent'
 ASVrel.abund.pa$Frequency=factor(ASVrel.abund.pa$Frequency, levels = c('Unfrequent', 'Frequent', 'Most Frequent'))
 
 #### Add the Functional Ratio to the abundance and occupancy
-ASVrel.abund.pa.fun=data.frame(ASVrel.abund.pa) #, ASVfunRat) removed funRat because it was a weird metric
+ASVrel.abund.pa.fun=data.frame(ASVrel.abund.pa, ASVfunRat) 
 ASVrel.abund.pa.fun$ASVcode=rownames(ASVrel.abund.pa.fun)
 
 # Join relative abundance, occurrence and slope classification
@@ -98,6 +102,9 @@ otumelt2.div=left_join(otumelt_fun.div, taxatable,  by='ASVcode')
 # make sure the relative abundance column is numeric
 otumelt2.div$relative_abundance=as.numeric(as.character(otumelt2.div$relative_abundance))
 
+# save this long table
+#write.table(otumelt2.div, file='output_tables/otumelt2.div.txt', sep='\t')
+
 
 #### Generate list of ASVs with taxonomic and abundance data
 #Generate a list of unique family names in order of decreasing abundance	 (object: familylist3)
@@ -110,10 +117,8 @@ ASVlist_means.div=ddply(otumelt2.div, .(ASVcode), summarize,  Abund=mean(relativ
 ASVlist_means.div=ASVlist_means.div[order(ASVlist_means.div$Abund, decreasing=TRUE),]
 ASVlist2.div=left_join(ASVlist_means.div, taxatable)
 
-
 # Save this table:
-write.table(ASVlist2.div, file='output_tables/ASVlist2.txt', sep='\t')
-
+#write.table(ASVlist2.div, file='output_tables/ASVlist2.txt', sep='\t')
 
 #### Are there general trends of taxa over time?
 ggplot(otumelt2.div, aes(richness, log(Abundance+1))) + geom_jitter(aes(color=ASVcode), alpha=0.4)  + geom_smooth(method='lm', se=FALSE, color='black') + theme(legend.position='none') + geom_smooth(method='lm', aes(color=ASVcode), se=FALSE)
