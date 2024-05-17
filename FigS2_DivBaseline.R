@@ -52,7 +52,7 @@ Baseline2=left_join(Baseline, leaves_count, by = "leaf_age_weeks")
 # create weighted version of richness
 Baseline2$w_richness=Baseline2$richness/Baseline2$count
 
-### PLOT 
+### S1: baselines sample diversity over time
 
 # plot richness panels
 rich_regional=ggplot(Baseline, aes(leaf_age_weeks, richness))  + 
@@ -74,6 +74,12 @@ eve_regional=ggplot(Baseline, aes(leaf_age_weeks, evenness))  +
   geom_smooth(method=lm, formula=y ~ (x), se=FALSE, color='black', size=0.5) + 
   annotate('text', label='c.', x=0.8, y=0.7)
 
+# merge plots for Fig S1
+Fig_divControl=arrangeGrob(rich_regional, rich_local, eve_regional, ncol=2)
+quartz(width=6, height=6)
+plot(Fig_divControl)
+quartz.save('Figures/Fig_div_time_baselinecontrols.png', type='png', dpi=300)
+
 # stats
 # rich regional: stats for Fig S1a
 model_baseline=glm(richness ~ leaf_age_weeks, data=Baseline)
@@ -92,17 +98,37 @@ model_eve_baseline=glm(evenness ~ leaf_age_weeks, data=Baseline)
 summary(model_eve_baseline)
 Anova(model_eve_baseline)
 
-# merge plots for Fig S1
-Fig_divControl=arrangeGrob(rich_regional, rich_local, eve_regional, ncol=2)
-quartz(width=6, height=6)
-plot(Fig_divControl)
-quartz.save('Figures/Fig_div_time_baselinecontrols.png', type='png', dpi=300)
-
-
-### Comparing Baselines to Treatments
+### S1: Comparing Baselines to Treatments
 # plot richness
-=ggplot(meta.div, aes(treatment, richness)) + geom_boxplot(aes(fill=treatment)) + 
-  Theme + theme(axis.text.x = element_text(angle = 45, hjust=1)) +scale_fill_manual(values=c(cbbPalette[-8]))
+all_richness=ggplot(meta.div, aes(treatment, richness)) + 
+  geom_boxplot(aes(fill=treatment)) + 
+  Theme + theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  ylim(10,120) + ylab('Richness') + xlab('Treatments') +
+  scale_fill_manual(values=c(cbbPalette[-8])) +
+  annotate('text', label='a.', x=0.8, y=115)
 
-mod_controls=glm(richness ~ treatment, data=meta.div)
-summary(mod_controls)
+# calculate nmds
+NMDS.contr=metaMDS(ASVtable, k=3)
+meta.nmds=data.frame(meta.div, scores(NMDS.contr)$sites)
+
+all_nmds=ggplot(meta.nmds, aes(NMDS1, NMDS2)) + 
+  geom_point(size=4,aes(fill=treatment, shape=treatment), alpha=0.8) +  
+  scale_fill_manual(values=c(cbbPalette[-8])) + Theme + 
+  scale_shape_manual(values=c(25,21,21,21,21,21,25)) +
+  annotate('text', label='b.', x=-1.1, y=0.9)
+
+# merge plots for Fig S1
+Fig_all=arrangeGrob(all_richness, all_nmds, ncol=1)
+quartz(width=5, height=7)
+plot(Fig_all)
+quartz.save('Figures/Fig_all_baselineandtreatments.png', type='png', dpi=300)
+
+# stats
+# all richness data: stats for fig2a
+all_rich_mod=glm(richness ~ treatment, data=meta.div)
+summary(all_rich_mod)
+Anova(all_rich_mod)
+
+# all nms data: multivariate anova for fig2b
+adonis_cont=adonis2(ASVtable~treatment, data=meta.div) 
+adonis_cont
