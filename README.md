@@ -23,11 +23,10 @@ Data files are stored in the input_data folder
     1. TAXtable Taxonomy table
     2. ASVtable Species list
     3. METAtable Metadata1: Leaf age code, Treatment code, Replicate code.
-    4. FundExp_metadata: Metadata2: Tube_name, Treatment age code, Treatment code, Age code, Protozoan treatment, replicate code, initial worm weight, final worm weight, weigth loss
+    4. FundExp_metadata: Metadata2, contains weight loss data: Tube_name, Treatment age code, Treatment code, Age code, Protozoan treatment, replicate code, initial worm weight, final worm weight, weigth loss
+    5. MetaDiv_table: Metadata3, contains diversity calculations.
 Code scripts and workflow 
-Data preparation:
-    1. 
-Figures and statitics
+Figures and statistics
     1. Fig1_BEF_funexp
     2. Fig2
     3. Fig3
