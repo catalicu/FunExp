@@ -39,11 +39,11 @@ We assessed bacterial abundance using qPCR on the 16S rRNA gene and established 
 
 ## Data file descriptions
 Data files are stored in the input_data folder
-    1. TAXtable Taxonomy table
-    2. ASVtable Species list
-    3. METAtable Metadata1: Leaf age code, Treatment code, Replicate code.
-    4. FundExp_metadata: Metadata2, contains weight loss data: Tube_name, Treatment age code, Treatment code, Age code, Protozoan treatment, replicate code, initial worm weight, final worm weight, weigth loss
-    5. MetaDiv_table: Metadata3, contains diversity calculations.
+    1. TAXtable Taxonomy table 
+    2. ASVtable Species list 
+    3. METAtable Metadata1: Leaf age code, Treatment code, Replicate code. 
+    4. FundExp_metadata: Metadata2, contains weight loss data: Tube_name, Treatment age code, Treatment code, Age code, Protozoan treatment, replicate code, initial worm weight, final worm weight, weigth loss 
+    5. MetaDiv_table: Metadata3, contains diversity calculations. 
 
 SOFTWARE VERSIONS
 The software and package versions can be found in the [session information](https://github.com/catalicu/FunExp/blob/main/sessionInfo_funexp04242025.txt) file. 
