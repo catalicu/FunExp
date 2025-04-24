@@ -25,7 +25,7 @@ A central figure in this study depicts the relationship betwen ASV richness and 
 
 * [Fig1_BEF_funexp_main_bDiv_cFun.R](https://github.com/catalicu/FunExp/blob/main/Fig1_BEF_funexp_main_bDiv_cFun.R) contains the figure and stats to represent this general diversity-funciton relationship. 
 * The stats include model selection as conducted in [Fig1_BEF_funexp_main_bDiv_cFun Stats.R](https://github.com/catalicu/FunExp/blob/main/Fig1_BEF_funexp_main_bDiv_cFun Stats.R).
-The final figure was edited in power point for the position of the panels [Figures/Fig1_wlegend.png](https://github.com/catalicu/FunExp/blob/main/Fig1_wlegend.png)
+The final figure was edited in power point for the position of the panels [Figure 1](https://github.com/catalicu/FunExp/blob/main/Figures/Fig1_wlegend.png)
 
 Other files and figures reflect the remaining figures and statistics included in the manuscript. 
 
