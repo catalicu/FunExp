@@ -29,8 +29,9 @@ The final figure was edited in power point for the position of the panels [Figur
 
 Other files and figures reflect the remaining figures and statistics included in the manuscript: 
 
-* We complemented the analysis using a Structural Equation Modeling (SEM) approach. The script includes the modeling and plotting steps: [SEM script](https://github.com/catalicu/FunExp/blob/main/FunExp_SEM2025.R). 
-* We estimated bacterial abundance using 16S rRNA gene copy numbers. Abundance relationships with leaf age (Fig3a), ASV richness (Fig3b) and weight change (Fig3c) are assessed in script for [Fig3](https://github.com/catalicu/FunExp/blob/main/Fig4_qPCR_FunExp.R). The script includes steps to create the plot and calculate statistics. Figure 3 can be seen [HERE](https://github.com/catalicu/FunExp/blob/main/Figures/Fig3_qPCR.tiff.png)
+* We complemented the analysis using a Structural Equation Modeling (SEM) approach. The script includes the modeling and plotting steps: [SEM script](https://github.com/catalicu/FunExp/blob/main/FunExp_SEM2025.R). Figure 2 can be seen [HERE](https://github.com/catalicu/FunExp/blob/main/Figures/Fig2_SEM.png). 
+* We estimated bacterial abundance using 16S rRNA gene copy numbers. Abundance relationships with leaf age (Fig3a), ASV richness (Fig3b) and weight change (Fig3c) are assessed in script for [Fig3](https://github.com/catalicu/FunExp/blob/main/Fig3_qPCR_FunExp.R). The script includes steps to create the plot and calculate statistics. Figure 3 can be seen [HERE](https://github.com/catalicu/FunExp/blob/main/Figures/Fig3_qPCR.tiff). 
+* We illustrated the change in community composition due to leaf age using an NMDS and a perMANOVA. The script to perform these steps can be found in the script for [Figure 4](https://github.com/catalicu/FunExp/blob/main/Fig4_NMDS_adonis.R). Figure 4 can be seen [HERE](https://github.com/catalicu/FunExp/blob/main/Figures/Fig4_NMDS_small.pdf). 
 
 **Controls**  
 To establish the diversity and function baselines before running the degradation experiment, we built a [Fig_DivBaseline.R](https://github.com/catalicu/FunExp/blob/main/Fig_DivBaseline.R). 
