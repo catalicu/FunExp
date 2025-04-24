@@ -21,9 +21,11 @@ This data repository consist of data files, code scripts, and this README docume
 ## Contents and narrative
 This manuscript depicts the changes in bacterial diversity and function along the life of a pitcher plant leaf. 
 
-A central figure in this study depicts the relationship betwen ASV richness and Degradation, showing a negative relationship between diversity and in pitcher plant bacterial communities. 
+A central figure in this study depicts the relationship betwen ASV richness and Degradation, showing a negative relationship between diversity and in pitcher plant bacterial communities. Figure 1 in the manuscript includes the relationship between biodiversity and function (Fig1a) as well as the change in diversity (Fig1b) and function (Fig1c) over time, as the pitcher plant ages. Here are the scripts that were used to create these figures and the associated statistics to test for significance:
 
-[Fig1_BEF_funexp_main.R](https://github.com/catalicu/FunExp/blob/main/Fig1_BEF_funexp_main.R) contains the figure and stats to represent this general diversity-funciton relationship. The stats include model selection as conducted in [Stat_BEFmain_models.R](https://github.com/catalicu/FunExp/blob/main/Fig1_BEF_funexp_main.R).
+* [Fig1_BEF_funexp_main_bDiv_cFun.R](https://github.com/catalicu/FunExp/blob/main/Fig1_BEF_funexp_main_bDiv_cFun.R) contains the figure and stats to represent this general diversity-funciton relationship. 
+* The stats include model selection as conducted in [Fig1_BEF_funexp_main_bDiv_cFun Stats.R](https://github.com/catalicu/FunExp/blob/main/Fig1_BEF_funexp_main_bDiv_cFun Stats.R).
+The final figure was edited in power point for the position of the panels [Fig1_wlegend.png](https://github.com/catalicu/FunExp/blob/main/Fig1_wlegend.png)
 
 Other files and figures reflect the remaining figures and statistics included in the manuscript. 
 
