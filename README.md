@@ -23,19 +23,19 @@ This manuscript depicts the changes in bacterial diversity and function along th
 
 A central figure in this study depicts the relationship betwen ASV richness and Degradation, showing a negative relationship between diversity and in pitcher plant bacterial communities. Figure 1 in the manuscript includes the relationship between biodiversity and function (Fig1a) as well as the change in diversity (Fig1b) and function (Fig1c) over time, as the pitcher plant ages. Here are the scripts that were used to create these figures and the associated statistics to test for significance:
 
-* [Fig1 script](https://github.com/catalicu/FunExp/main/blob/Fig1_BEF_funexp_main_bDiv_cFun.R) contains the figure and stats to represent this general diversity-funciton relationship. 
-* The stats include model selection as conducted in [Fig1 stats script](https://github.com/catalicu/FunExp/main/blob/Fig1_BEF_funexp_main_bDiv_cFun_Stats.R). The final figure was edited in power point for the position of the panels [Figure 1](https://github.com/catalicu/FunExp/main/blob/Figures/Fig1_wlegend.png). 
+* [Fig1 script](https://github.com/catalicu/FunExp/blob/main/Fig1_BEF_funexp_main_bDiv_cFun.R) contains the figure and stats to represent this general diversity-funciton relationship. 
+* The stats include model selection as conducted in [Fig1 stats script](https://github.com/catalicu/FunExp/blob/main/Fig1_BEF_funexp_main_bDiv_cFun_Stats.R). The final figure was edited in power point for the position of the panels [Figure 1](https://github.com/catalicu/FunExp/blob/main/Figures/Fig1_wlegend.png). 
 
 Other files and figures reflect the remaining figures and statistics included in the manuscript: 
 
-* We complemented the analysis using a Structural Equation Modeling (SEM) approach. The script includes the modeling and plotting steps: [SEM script](https://github.com/catalicu/FunExp/main/blob/FunExp_SEM2025.R). Figure 2 can be seen [HERE](https://github.com/catalicu/FunExp/main/blob/Figures/Fig2_SEM.png). 
-* We estimated bacterial abundance using 16S rRNA gene copy numbers. Abundance relationships with leaf age (Fig3a), ASV richness (Fig3b) and weight change (Fig3c) are assessed in script for [Fig3](https://github.com/catalicu/FunExp/main/blob/Fig3_qPCR_FunExp.R). The script includes steps to create the plot and calculate statistics. Figure 3 can be seen [HERE](https://github.com/catalicu/FunExp/main/blob/Figures/Fig3_qPCR.tiff). 
-* We illustrated the change in community composition due to leaf age using an NMDS and a perMANOVA. The script to perform these steps can be found in the script for [Figure 4](https://github.com/catalicu/FunExp/main/blob/Fig4_NMDS_adonis.R). Figure 4 can be seen [HERE](https://github.com/catalicu/FunExp/main/blob/Figures/Fig4_NMDS_small.pdf). 
-* We explored the role of specific ASVs in contributing to diversity and function. The script [AVS plotprep](https://github.com/catalicu/FunExp/main/blob/Fig6_FunASV_plotprep.R) sets up the data table in long format while the script [ASV plot](https://github.com/catalicu/FunExp/Fig6_FunASV_plotprep.R) performs the plotting and statistical calculations. The resulting plots can be seen in [Figure 6](https://github.com/catalicu/FunExp/Figures/Fig6.png). 
+* We complemented the analysis using a Structural Equation Modeling (SEM) approach. The script includes the modeling and plotting steps: [SEM script](https://github.com/catalicu/FunExp/blob/main/FunExp_SEM2025.R). Figure 2 can be seen [HERE](https://github.com/catalicu/FunExp/blob/main/Figures/Fig2_SEM.png). 
+* We estimated bacterial abundance using 16S rRNA gene copy numbers. Abundance relationships with leaf age (Fig3a), ASV richness (Fig3b) and weight change (Fig3c) are assessed in script for [Fig3](https://github.com/catalicu/FunExp/blob/main/Fig3_qPCR_FunExp.R). The script includes steps to create the plot and calculate statistics. Figure 3 can be seen [HERE](https://github.com/catalicu/FunExp/blob/main/Figures/Fig3_qPCR.tiff). 
+* We illustrated the change in community composition due to leaf age using an NMDS and a perMANOVA. The script to perform these steps can be found in the script for [Figure 4](https://github.com/catalicu/FunExp/blob/main/Fig4_NMDS_adonis.R). Figure 4 can be seen [HERE](https://github.com/catalicu/FunExp/blob/main/Figures/Fig4_NMDS_small.pdf). 
+* We explored the role of specific ASVs in contributing to diversity and function. The script [AVS plotprep](https://github.com/catalicu/FunExp/blob/main/Fig6_FunASV_plotprep.R) sets up the data table in long format while the script [ASV plot](https://github.com/catalicu/FunExp/Fig6_FunASV_plotprep.R) performs the plotting and statistical calculations. The resulting plots can be seen in [Figure 6](https://github.com/catalicu/FunExp/blob/main/Figures/Fig6.png). 
 
 ## Controls and supplementary materials 
-To establish the diversity and function baselines before running the degradation experiment, we built a [Fig_DivBaseline.R](https://github.com/catalicu/FunExp/main/blob/Fig_DivBaseline.R). 
-We assessed bacterial abundance using qPCR on the 16S rRNA gene and established whether abundance influences diversity and/or function in [qPCR_FunExp.R](https://github.com/catalicu/FunExp/qPCR_FunExp.Rmd).  
+To establish the diversity and function baselines before running the degradation experiment, we built a [Fig_DivBaseline.R](https://github.com/catalicu/FunExp/blob/main/Fig_DivBaseline.R). 
+We assessed bacterial abundance using qPCR on the 16S rRNA gene and established whether abundance influences diversity and/or function in [qPCR_FunExp.R](https://github.com/catalicu/FunExp/blob/main/qPCR_FunExp.Rmd).  
 
 ## Data file descriptions
 Data files are stored in the input_data folder
@@ -46,7 +46,7 @@ Data files are stored in the input_data folder
     5. MetaDiv_table: Metadata3, contains diversity calculations.
 
 SOFTWARE VERSIONS
-The software and package versions can be found in the [session information](https://github.com/catalicu/FunExp/main/blob/sessionInfo_funexp04242025.txt) file. 
+The software and package versions can be found in the [session information](https://github.com/catalicu/FunExp/blob/main/sessionInfo_funexp04242025.txt) file. 
 
 REFERENCES
 [references to papers referred to in this repository, if any]
