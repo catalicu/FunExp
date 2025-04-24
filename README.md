@@ -1,10 +1,13 @@
-This README.txt file was updated on 04/16/2025 
+This README.txt file was updated on 04/16/2025.   
 A. Paper associated with this archive
 Title: 'Opposing effects of succession on bacterial diversity and function within pitcher plant (Sarracenia purpurea) leaves'
 Citation: To be updated upon acceptance
 Brief abstract: 
 How biodiversity and ecosystem functions change with succession has proven to be difficult to predict. We hypothesize that community diversity and function may respond in opposite ways to successional drivers such as nutrient availability, species interactions or abiotic stress. The microbial communities within Sarracenia purpurea leaves perform degradation functions, providing essential nutrients to the plant, but we know little about how succession within the leaf influences bacterial diversity and degradation. We collected pitcher plant fluid from leaves aged 2 to 24 weeks to use in microcosm experiments. We added a common bacterivore to half of the replicated microcosms to establish whether predation is a central successional driver. We used amplicon sequencing and a degradation assay to quantify diversity and ecosystem function.
-Names, institutions of all authors
+
+B. Author information: 
+Names, institutions of all authors: TBD 
+
 C. Contact information
 Name: To be updated upon acceptance
 Address:To be updated upon acceptance
