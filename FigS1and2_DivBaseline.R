@@ -3,13 +3,14 @@
 # for Figures S1,  S2 and table S2
 
 # Libraries
-library(ggplot2)
 library(vegan)
-library(plyr)
-library(nlme)
-library(gridExtra)
-library(dplyr)
 library(car)
+#library(ggplot2)
+#library(plyr)
+#library(nlme)
+#library(gridExtra)
+#library(dplyr)
+
 
 # Plot themes
 ## With legend
@@ -17,9 +18,6 @@ Theme=theme_classic(base_size=11, base_family="Helvetica") +
     theme(axis.line = element_line(size = 1, colour = "black", linetype = "solid")) +theme(plot.title = element_text(size = 12))
 ## Without legends
 Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fill=NA))
-
-# set wd
-
 
 #Color friendly: The palette with black:
 cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")

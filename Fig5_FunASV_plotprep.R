@@ -1,17 +1,15 @@
 #title: "FunASV_plots"
 #author: "Dr CG"
-#date:"1/13/2023"
+#date:"6/27/2025"
 # taken from:
 
 # Description:
-# This script creates figures to identify ASV underlying function:
+# This script prepares data to create figures to identify ASV underlying function:
   # * ASV relative abundances vs function
   # * General patterns of ASV distribution and occurrences
 
 # Libraries
-
-# Libraries
-library(ggplot2)
+#library(ggplot2)
 library(dplyr)
 library(plyr)
 library(reshape2)
@@ -35,7 +33,7 @@ ASVtable=ASVtable.fundiv[,2:1376]
 ## metadata exclusive
 metatable=ASVtable.fundiv[,1377:1394]
 
-# prep table for Fig6c
+# prep table for Fig5c
 # from v10:
 ### Calculate: mean abundance, occurrence and mean functional output per ASV
 
@@ -82,8 +80,6 @@ ASVrel.abund.pa.fun.sorted[which(is.na(ASVrel.abund.pa.fun.sorted$Slope)),6]='Un
 #write.table(ASVrel.abund.pa.fun.sorted, file='output_tables/ASVrel.abund.pa.txt', sep='\t')
 
 
-# prep table for Fig6a and b
-# from vXXX:
 ### Melt the abundance data set into a long format
 
 # Before melting, reduce the dataset to taxa that we were able to relate to function (in scritp v8)
@@ -100,25 +96,17 @@ head(otumelt_fun.div)
 otumelt2.div=left_join(otumelt_fun.div, taxatable,  by='ASVcode')
 
 # make sure the relative abundance column is numeric
-otumelt2.div$relative_abundance=as.numeric(as.character(otumelt2.div$relative_abundance))
-
-# save this long table
-#write.table(otumelt2.div, file='output_tables/otumelt2.div.txt', sep='\t')
-
+otumelt2.div$Abundance=as.numeric(as.character(otumelt2.div$Abundance))
 
 #### Generate list of ASVs with taxonomic and abundance data
 #Generate a list of unique family names in order of decreasing abundance	 (object: familylist3)
 #Also create a table with abundance per family (object: meanlist.fam3).
-
 ASVlist.div=unique(otumelt2.div$ASVcode)	#866 taxa
 
 # calculate means for abundance per taxon
-ASVlist_means.div=ddply(otumelt2.div, .(ASVcode), summarize,  Abund=mean(relative_abundance, na.rm=TRUE))
+ASVlist_means.div=ddply(otumelt2.div, .(ASVcode), summarize,  Abund=mean(Abundance, na.rm=TRUE))
 ASVlist_means.div=ASVlist_means.div[order(ASVlist_means.div$Abund, decreasing=TRUE),]
 ASVlist2.div=left_join(ASVlist_means.div, taxatable)
 
 # Save this table:
 #write.table(ASVlist2.div, file='output_tables/ASVlist2.txt', sep='\t')
-
-#### Are there general trends of taxa over time?
-ggplot(otumelt2.div, aes(richness, log(Abundance+1))) + geom_jitter(aes(color=ASVcode), alpha=0.4)  + geom_smooth(method='lm', se=FALSE, color='black') + theme(legend.position='none') + geom_smooth(method='lm', aes(color=ASVcode), se=FALSE)

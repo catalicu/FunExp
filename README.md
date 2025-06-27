@@ -45,15 +45,23 @@ Data files are stored in the input_data folder:
 4. FundExp_metadata.txt: Contains weight loss data including Tube_name, Treatment age code, Treatment code, Age code, Protozoan treatment, replicate code, initial worm weight, final worm weight, weigth loss. It contains 97 samples.  
 5. MetaDiv_table_FunExp12021-03-30.txt: Table listing each sample's diversity calculations, including Richness, Shannon and Simpson's index and Pielou's evenness. It contains 97 samples.  
 6. FunEx1_calculations.csv and FunEx2_calculations.csv: Datatables with calculated 16S rRNA gene copy counts from qPCR. 
-7. ASVtable_forGLM_FunExp12023-01-04.txt: This table includes ASV abundance data from data file 1 and Metadata table from data file 3 for each sample. It contains 97 samples. 
+7. ASVtable_forGLM_FunExp12023-01-04.txt: This table includes ASV abundance data from data file 1 and Metadata table from data file 3 for each sample. It contains 97 samples.  
 
-## Scritp descriptions
+Data files product of data analysis are stored in the output_table/ folder:
+8. ASVslope_sorted52024-02-21.txt:
+9. ASVrel.abund.pa.txt: This table is generated with script 6. It includes each ASV's average relative abundance, frequency, the slope of its relationship with function and its phylogenetic classification.  
+10. ASVlist2.txt: This table is generated with script 6. It includes each ASV's code, average relative abundance, phylogenetic affiliations and its identifier sequence.
+
+
+
+## Script descriptions
 1. Fig1_BEF_funexp_main_bDiv_cFun.R: This script creates the three panels for Fig 1. The input for this script includes data files 2, 3, 4 and 5.  
 2. Fig1_BEF_funexp_main_bDiv_cFun_Stats.R: Performs statistical testing to support patterns displayed in Fig1. Input used includes data files 2, 3, 4, and 5.  
 3. Fig2_FunExp_SEM2025.R: Performs SEM analysis and generates Figure 2. Input files are data files 3, and 4.  
 4. Fig3_qPCR_FunExp.Rmd: This script is in Rmarkdown. It creates figure 3 and performs statistical analyses associated with our qPCR data. It uses data file 6, as well as 2 and 7 for comparisons.  
 5. Fig4_NMDS_adonis.R: Performs multivariate analyses including perMANOVA, NMDS ordination and homogeneity of distances. Uses data files 2 and 3. 
-6. Fig6_FunASV_plotprep.R
+6. Fig5_FunASV_plotprep.R: This script prepares data to create figures to identify ASV underlying function. It relies on data file 1, 7 and 8. This scripts generates data files 9 and 10, required for script 7.
+7. Fig5_FunASV_plot.R: This script generates Figure 5. Using data files 8, 9, and 10. Data files 9 and 10 are generated with script 6, make sure to run it before script 7.
 
 SOFTWARE VERSIONS
 The software and package versions can be found in the [session information](https://github.com/catalicu/FunExp/blob/main/sessionInfo_funexp04242025.txt) file. 

@@ -10,7 +10,6 @@
 # Libraries
 library(ggplot2)
 library(dplyr)
-#library(reshape2)
 library(gridExtra)
 
 # Plot themes
@@ -23,33 +22,6 @@ Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fi
 # Load data - from 'Fig6_FunASV_plotprep.R' 
 ASVlist2.div=read.table('output_tables/ASVlist2.txt', header=TRUE)
 ASVrel.abund.pa.fun.sorted=read.table('output_tables/ASVrel.abund.pa.txt', header=TRUE)
-
-# X.not informative to see the change over time, is it?
-# does the most functional taxa increase over time? Yes
-#otumelt2_ASV35.div=otumelt2.div[which(otumelt2.div$ASVcode=='ASV35'),]
-#Fig6a_ASV35=ggplot(otumelt2_ASV35.div[which(otumelt2_ASV35.div$Abundance!=0),], 
-#       aes(leaf_age_weeks2, log(Abundance+1))) + geom_point() + 
-#  geom_smooth(method='lm', se=FALSE, color='black') + Theme +
-#  xlab('Leaf age (weeks)') + ylab('log(ASV35 standardized abundance)') +
-#  annotate('text', x=1, y=8, label='a.')
-
-# X. if the other plots are not around, why is this useful?
-#### Do the most abundant taxa increase over time? No
-#otumelt2_ASV1.div=otumelt2.div[which(otumelt2.div$ASVcode=='ASV1'),]
-#Fig6b_ASV1=ggplot(otumelt2_ASV1.div[which(otumelt2_ASV1.div$Abundance!=0),], aes(leaf_age_weeks2, log(Abundance+1))) + geom_point() + 
-#  geom_smooth(method='lm', se=FALSE, color='black') + Theme +
-#  xlab('Leaf age (weeks)') + ylab('log(ASV1 standardized abundance)') +
-#  annotate('text', x=1, y=12, label='b.')
-
-
-# X. to few datapoints 
-#### does the most functional taxa increase over time? Yes - but too few datapoints.
-#otumelt2_ASV691.div=otumelt2.div[which(otumelt2.div.div$ASVcode=='ASV691'),]
-#Fig6c_ASV691=ggplot(otumelt2_ASV691.div[which(otumelt2_ASV691.div$Abundance!=0),], 
-#       aes(leaf_age_weeks2, log(Abundance+1))) + geom_point() + 
-#  geom_smooth(method='lm', se=FALSE, color='black') + Theme +
-#  xlab('Leaf age (weeks)') + ylab('ASV691 standardized abundance') +
-#  annotate('text', x=1, y=4, label='c.')
 
 # a. 
 #### are there relationships between abundance, occurrence and function? No
@@ -64,8 +36,8 @@ ASVselect=ASVrel.abund.pa.fun.sorted[c(which(ASVrel.abund.pa.fun.sorted$ASVcode=
                            which(ASVrel.abund.pa.fun.sorted$ASVcode=='ASV1'),
                            which(ASVrel.abund.pa.fun.sorted$ASVcode=='ASV691')),]
 avFunASV=ggplot(ASVselect, aes(ASVcode, ASVfunRat)) + geom_col(color='black', aes(fill=ASVcode)) +
-  Theme + xlab('') + ylab('average weight loss \n standardized by ASV abundance') +
-  scale_fill_manual(values=c('white', 'grey', 'black')) + 
+  Theme2 + xlab('') + ylab('average weight loss \n standardized by ASV abundance') +
+  scale_fill_manual(values=c('black', 'white', 'white'))+ 
   annotate('text', x=0.7, y=1.1, label='b.')
 
 
