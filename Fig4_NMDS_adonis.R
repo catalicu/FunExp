@@ -1,3 +1,12 @@
+#title: "Fig4_NMDS_adonis.R"
+#author: "Dr CG"
+#date edits:"6/27/2025"
+
+# Description:
+# This script creates the three panels for figure 1 including a) the BEF
+# relationship, b) the change of diversity with leaf age and c) the change
+# in function with leaf age. 
+
 # Libraries
 library(ggplot2)
 library(vegan)
