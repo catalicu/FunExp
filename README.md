@@ -1,4 +1,4 @@
-This README.txt file was updated on 04/16/2025. 
+This README.md file was updated on 06/27/2025. 
 
 ## A. Paper associated with this archive 
 Title: 'Opposing effects of succession on bacterial diversity and function within pitcher plant (Sarracenia purpurea) leaves' 
@@ -8,12 +8,12 @@ Brief abstract:
 How biodiversity and ecosystem functions change with succession has proven to be difficult to predict. We hypothesize that community diversity and function may respond in opposite ways to successional drivers such as nutrient availability, species interactions or abiotic stress. The microbial communities within Sarracenia purpurea leaves perform degradation functions, providing essential nutrients to the plant, but we know little about how succession within the leaf influences bacterial diversity and degradation. We collected pitcher plant fluid from leaves aged 2 to 24 weeks to use in microcosm experiments. We added a common bacterivore to half of the replicated microcosms to establish whether predation is a central successional driver. We used amplicon sequencing and a degradation assay to quantify diversity and ecosystem function.
 
 ## B. Author information: 
-Names, institutions of all authors: To be updated upon acceptance 
+Names, institutions of all authors: To be updated upon acceptance. 
 
 ## C. Contact information
-Name: To be updated upon acceptance
-Address:To be updated upon acceptance
-email:To be updated upon acceptance 
+Name: To be updated upon acceptance  
+Address:To be updated upon acceptance  
+Email:To be updated upon acceptance 
 
 # DATA & CODE FILE OVERVIEW
 This data repository consist of data files, code scripts, and this README document, with the following data and code filenames and variables. 
@@ -39,11 +39,11 @@ We assessed bacterial abundance using qPCR on the 16S rRNA gene and established 
 
 ## Data file descriptions
 Data files are stored in the input_data folder: 
-1. TAXtable Taxonomy table. 
-2. ASVtable Species list. 
-3. METAtable Metadata1: Leaf age code, Treatment code, Replicate code. 
-4. FundExp_metadata: Metadata2, contains weight loss data: Tube_name, Treatment age code, Treatment code, Age code, Protozoan treatment, replicate code, initial worm weight, final worm weight, weigth loss 
-5. MetaDiv_table: Metadata3, contains diversity calculations. 
+1. TAXtable_FunExp12021-03-24.txt: Taxonomy table with ASV sequence, Phylum, Class, Order, Family, Genus. It lists the full dataset with 1375 ASVs. 
+2. ASVtable_FunExp12021-03-24.txt: Sample vs ASV table showing read abundances. It contains 97 samples and 1375 ASVs. 
+3. METAtable_RunExp1230-03-24_sampleNamesFIX.txt: Table listing each sample's Leaf age code, Treatment code, and Replicate code. It contains 97 samples.
+4. FundExp_metadata.txt: Contains weight loss data including Tube_name, Treatment age code, Treatment code, Age code, Protozoan treatment, replicate code, initial worm weight, final worm weight, weigth loss. It contains 97 samples.
+5. MetaDiv_table_FunExp12021-03-30.txt: Table listing each sample's diversity calculations, including Richness, Shannon and Simpson's index and Pielou's evenness. It contains 97 samples. 
 
 SOFTWARE VERSIONS
 The software and package versions can be found in the [session information](https://github.com/catalicu/FunExp/blob/main/sessionInfo_funexp04242025.txt) file. 
