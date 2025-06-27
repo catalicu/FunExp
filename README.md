@@ -24,14 +24,14 @@ This manuscript depicts the changes in bacterial diversity and function along th
 A central figure in this study depicts the relationship betwen ASV richness and Degradation, showing a negative relationship between diversity and in pitcher plant bacterial communities. Figure 1 in the manuscript includes the relationship between biodiversity and function (Fig1a) as well as the change in diversity (Fig1b) and function (Fig1c) over time, as the pitcher plant ages. Here are the scripts that were used to create these figures and the associated statistics to test for significance:
 
 * [Fig1 script](https://github.com/catalicu/FunExp/blob/main/Fig1_BEF_funexp_main_bDiv_cFun.R) contains the figure and stats to represent this general diversity-funciton relationship. 
-* The stats include model selection as conducted in [Fig1 stats script](https://github.com/catalicu/FunExp/blob/main/Fig1_BEF_funexp_main_bDiv_cFun_Stats.R). The final figure was edited in power point for the position of the panels [Figure 1](https://github.com/catalicu/FunExp/blob/main/Figures/Fig1_wlegend.png). 
+* The stats include model selection as conducted in [Fig1 stats script](https://github.com/catalicu/FunExp/blob/main/Fig1_BEF_funexp_main_bDiv_cFun_Stats.R). The final figure was edited in power point for the position of the panels.  
 
 Other files and figures reflect the remaining figures and statistics included in the manuscript: 
 
-* We complemented the analysis using a Structural Equation Modeling (SEM) approach. The script includes the modeling and plotting steps: [SEM script](https://github.com/catalicu/FunExp/blob/main/FunExp_SEM2025.R). Figure 2 can be seen [HERE](https://github.com/catalicu/FunExp/blob/main/Figures/Fig2_SEM.png). 
-* We estimated bacterial abundance using 16S rRNA gene copy numbers. Abundance relationships with leaf age (Fig3a), ASV richness (Fig3b) and weight change (Fig3c) are assessed in script for [Fig3](https://github.com/catalicu/FunExp/blob/main/Fig3_qPCR_FunExp.R). The script includes steps to create the plot and calculate statistics. Figure 3 can be seen [HERE](https://github.com/catalicu/FunExp/blob/main/Figures/Fig3_qPCR.tiff). 
-* We illustrated the change in community composition due to leaf age using an NMDS and a perMANOVA. The script to perform these steps can be found in the script for [Figure 4](https://github.com/catalicu/FunExp/blob/main/Fig4_NMDS_adonis.R). Figure 4 can be seen [HERE](https://github.com/catalicu/FunExp/blob/main/Figures/Fig4_NMDS_small.pdf). 
-* We explored the role of specific ASVs in contributing to diversity and function. The script [AVS plotprep](https://github.com/catalicu/FunExp/blob/main/Fig6_FunASV_plotprep.R) sets up the data table in long format while the script [ASV plot](https://github.com/catalicu/FunExp/Fig6_FunASV_plotprep.R) performs the plotting and statistical calculations. The resulting plots can be seen in [Figure 6](https://github.com/catalicu/FunExp/blob/main/Figures/Fig6.png). 
+* We complemented the analysis using a Structural Equation Modeling (SEM) approach. The script includes the modeling and plotting steps: [SEM script](https://github.com/catalicu/FunExp/blob/main/FunExp_SEM2025.R). 
+* We estimated bacterial abundance using 16S rRNA gene copy numbers. Abundance relationships with leaf age (Fig3a), ASV richness (Fig3b) and weight change (Fig3c) are assessed in script for [Fig3](https://github.com/catalicu/FunExp/blob/main/Fig3_qPCR_FunExp.R). The script includes steps to create the plot and calculate statistics. 
+* We illustrated the change in community composition due to leaf age using an NMDS and a perMANOVA. The script to perform these steps can be found in the script for [Figure 4](https://github.com/catalicu/FunExp/blob/main/Fig4_NMDS_adonis.R).  
+* We explored the role of specific ASVs in contributing to diversity and function. The script [AVS plotprep](https://github.com/catalicu/FunExp/blob/main/Fig6_FunASV_plotprep.R) sets up the data table in long format while the script [ASV plot](https://github.com/catalicu/FunExp/Fig6_FunASV_plotprep.R) performs the plotting and statistical calculations. 
 
 ## Controls and supplementary materials 
 To establish the diversity and function baselines before running the degradation experiment, we built a [Fig_DivBaseline.R](https://github.com/catalicu/FunExp/blob/main/Fig_DivBaseline.R). 
@@ -39,11 +39,22 @@ We assessed bacterial abundance using qPCR on the 16S rRNA gene and established 
 
 ## Data file descriptions
 Data files are stored in the input_data folder: 
-1. TAXtable_FunExp12021-03-24.txt: Taxonomy table with ASV sequence, Phylum, Class, Order, Family, Genus. It lists the full dataset with 1375 ASVs. 
-2. ASVtable_FunExp12021-03-24.txt: Sample vs ASV table showing read abundances. It contains 97 samples and 1375 ASVs. 
-3. METAtable_RunExp1230-03-24_sampleNamesFIX.txt: Table listing each sample's Leaf age code, Treatment code, and Replicate code. It contains 97 samples.
-4. FundExp_metadata.txt: Contains weight loss data including Tube_name, Treatment age code, Treatment code, Age code, Protozoan treatment, replicate code, initial worm weight, final worm weight, weigth loss. It contains 97 samples.
-5. MetaDiv_table_FunExp12021-03-30.txt: Table listing each sample's diversity calculations, including Richness, Shannon and Simpson's index and Pielou's evenness. It contains 97 samples. 
+1. TAXtable_FunExp12021-03-24.txt: Taxonomy table with ASV sequence, Phylum, Class, Order, Family, Genus. It lists the full dataset with 1375 ASVs.  
+2. ASVtable_FunExp12021-03-24.txt: Sample vs ASV table showing read abundances. It contains 97 samples and 1375 ASVs.  
+3. METAtable_RunExp1230-03-24_sampleNamesFIX.txt: Table listing each sample's Leaf age code, Treatment code, and Replicate code. It contains 97 samples.  
+4. FundExp_metadata.txt: Contains weight loss data including Tube_name, Treatment age code, Treatment code, Age code, Protozoan treatment, replicate code, initial worm weight, final worm weight, weigth loss. It contains 97 samples.  
+5. MetaDiv_table_FunExp12021-03-30.txt: Table listing each sample's diversity calculations, including Richness, Shannon and Simpson's index and Pielou's evenness. It contains 97 samples.  
+6. FunEx1_calculations.csv and FunEx2_calculations.csv: Datatables with calculated 16S rRNA gene copy counts from qPCR. 
+7. ASVtable_forGLM_FunExp12023-01-04.txt: This table includes ASV abundance data from data file 1 and Metadata table from data file 3 for each sample. It contains 97 samples. 
+
+## Scritp descriptions
+1. Fig1_BEF_funexp_main_bDiv_cFun.R: This script creates the three panels for Fig 1. The input for this script includes data files 2, 3, 4 and 5. 
+2. Fig1_BEF_funexp_main_bDiv_cFun_Stats.R: Performs statistical testing to support patterns displayed in Fig1. Input used includes data files 2, 3, 4, and 5. 
+3. Fig2_FunExp_SEM2025.R: Performs SEM analysis and generates Figure 2. Input files are data files 3, and 4
+4. Fig3_qPCR_FunExp.Rmd: This script is in Rmarkdown. It creates figure 3 and performs statistical analyses associated with our qPCR data. It uses data file 6, as well as 2 and 7 for comparisons. 
+5. Fig4_NMDS_adonis.R: 
+6. Fig6_FunASV_plotprep.R
+7. qPCR_FunExp.Rmd
 
 SOFTWARE VERSIONS
 The software and package versions can be found in the [session information](https://github.com/catalicu/FunExp/blob/main/sessionInfo_funexp04242025.txt) file. 

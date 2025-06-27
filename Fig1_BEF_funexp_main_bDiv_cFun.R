@@ -1,6 +1,6 @@
 #title: "Fig1_BEF_funexp_main_bDiv_cFun.R"
 #author: "Dr CG"
-#date:"3/28/2025"
+#date edits:"6/27/2025"
 
 # Description:
 # This script creates the three panels for figure 1 including a) the BEF
@@ -9,13 +9,9 @@
 
 # Libraries
 library(ggplot2)
-library(vegan)
 library(dplyr)
-library(lme4)
-library(nlme)
-library(gridExtra)
-library(car)
 library(effects)
+library(vegan)
 library(patchwork)
 
 #########################
@@ -30,11 +26,10 @@ Theme=theme_classic(base_size=11, base_family="Helvetica") +
 Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fill=NA))
 
 ASVtable=read.table('input_data/ASVtable_FunExp12021-03-24.txt', header=TRUE)
-TAXtable=read.table('input_data/TAXtable_FunExp12021-03-24.txt', header=TRUE)
 meta.table=read.table('input_data/METAtable_FunExp12021-03-24_sampleNamesFIX.txt', header=TRUE)
 
 div.table=read.table('input_data/MetaDiv_table_FunExp12021-03-30.txt', header=TRUE)
-colnames(div.table)[2]='Treatment'
+colnames(div.table)[2]='Treatment' # create columns with same names for left_join
 
 fun.table=read.table('input_data/FunExp_metadata.txt', header=TRUE)
 
@@ -65,7 +60,6 @@ BEFmain_fig= ggplot(fundiv.table_BEF, aes(log(richness), W_Change)) +
   scale_fill_manual(values=c('black','white')) 
 
 plot(BEFmain_fig)
-#quartz.save('Figures/Fig_BEFmain.png', type='png', dpi=300)
 
 ### evenness - for sup mat
 

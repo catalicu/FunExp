@@ -1,6 +1,6 @@
 #title: "Fig1_BEF_funexp_main_bDiv_cFun.R"
 #author: "Dr CG"
-#date:"3/28/2025"
+#date:"6/28/2025"
 
 # Description:
 # This script performs statistical testing to support patterns portrayed in 
@@ -11,9 +11,13 @@
 ## Stats ##
 #########################
 
+# Load libraries
+library(dplyr)
+library(vegan)
+
 # Load tables
 ASVtable=read.table('input_data/ASVtable_FunExp12021-03-24.txt', header=TRUE)
-TAXtable=read.table('input_data/TAXtable_FunExp12021-03-24.txt', header=TRUE)
+#TAXtable=read.table('input_data/TAXtable_FunExp12021-03-24.txt', header=TRUE)
 meta.table=read.table('input_data/METAtable_FunExp12021-03-24_sampleNamesFIX.txt', header=TRUE)
 
 div.table=read.table('input_data/MetaDiv_table_FunExp12021-03-30.txt', header=TRUE)
@@ -141,3 +145,4 @@ mod2.age7=glm(W_Change~leaf_age_weeks+treatment, data=fundiv.table2, family=Gamm
 AIC(mod2.age.null, mod2.age1, mod2.age2, mod2.age3, mod2.age4, mod2.age5, mod2.age6, mod2.age7)
 # test the best model against the null
 Anova(mod2.age5, test.statistic = 'Wald')
+

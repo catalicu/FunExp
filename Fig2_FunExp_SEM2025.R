@@ -1,14 +1,19 @@
 ######################################
 ## SEM - Multivariate analyses
-## 
 #######################################
+#title: "FunExp_SEM2025.R"
+#author: "Dr CG"
+#date edits:"6/27/2025"
+
+# Description:
+# This script performs the SEM analysis and generates Figure 2.
 
 # Preparation
 
 # Libraries
+library(dplyr)
 library(lavaan)
 library(lavaanPlot)
-library(dplyr)
 library(ggplot2)
 library(semPaths)
 
@@ -18,11 +23,13 @@ Theme=theme_classic(base_size=11, base_family="Helvetica") +
   theme(axis.line = element_line(size = 1, colour = "black", linetype = "solid")) +theme(plot.title = element_text(size = 12))
 ## Without legends
 Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fill=NA))
+
 # load tables: 
 div.table=read.table('input_data/MetaDiv_table_FunExp12021-03-30.txt', header=TRUE)
 colnames(div.table)[2]='Treatment'
 fun.table=read.table('input_data/FunExp_metadata.txt', header=TRUE)
 fundiv.table=left_join(fun.table, div.table)
+
 # edit:
 ## leaf ages as numbers
 fundiv.table$leaf_age_weeks2=as.numeric(fundiv.table$leaf_age_weeks)
