@@ -1,7 +1,6 @@
 #title: "FunASV_plots"
 #author: "Dr CG"
-#date:"1/13/2023"
-# taken from:
+#date:"6/28/2025"
 
 # Description:
 # This script creates figures to identify ASV underlying function:
@@ -9,11 +8,9 @@
   # * General patterns of ASV distribution and occurrences
 
 # Libraries
-
-# Libraries
 library(ggplot2)
 library(dplyr)
-library(reshape2)
+#library(reshape2)
 library(gridExtra)
 
 # Plot themes
