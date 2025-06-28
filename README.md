@@ -50,7 +50,7 @@ Data files are stored in the input_data folder:
 
 Data files product of data analysis are stored in the output_table/ folder:  
 9. ASVslope_sorted52024-02-21.txt:  
-10. ASVrel.abund.pa.txt: This table is generated with script 6. It includes each ASV's average relative abundance, frequency, the slope of its relationship with function and its phylogenetic classification. 
+10. ASVrel.abund.pa.txt: This table is generated with script 6. It includes each ASV's average relative abundance, frequency, the slope of its relationship with function and its phylogenetic classification.  
 11. ASVlist2.txt: This table is generated with script 6. It includes each ASV's code, average relative abundance, phylogenetic affiliations and its identifier sequence. 
 
 ## Script descriptions
@@ -64,7 +64,7 @@ These scripts process data to generate the figures and statistical tests for the
 7. Fig5_FunASV_plot.R: This script generates Figure 5. Using data files 9, 10, and 11. Data files 10 and 11 are generated with script 6, make sure to run it before script 7.
 
 These scripts process data to generate supplementary materials:  
-8. FigS1and2_DivBaseline.R: This script generates figure S1 and 2. It performs the associated statistical testing. Requires data files 2, 3 and 8.
+8. FigS1and2_DivBaseline.R: This script generates figure S1 and 2. It performs the associated statistical testing. Requires data files 2, 3 and 8.  
 9. FigS3_and stats_FunAge_noOld.R: This script generates figure 3 and performs the associated statistical tests. It requires data files 4 and 5. 
 
 # SOFTWARE VERSIONS
