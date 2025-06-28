@@ -48,12 +48,10 @@ Data files are stored in the input_data folder:
 7. ASVtable_forGLM_FunExp12023-01-04.txt: This table includes ASV abundance data from data file 1 and Metadata table from data file 3 for each sample. It contains 97 samples.  
 8. Leavs_per_age.csv: This table lists information from individual leaves sampled from the field, before being pooled per age group. The dataset contains information on 457 leaves and includes each leave's age, band number (identifier tag), and fluid volume.  
 
-Data files product of data analysis are stored in the output_table/ folder:
-9. ASVslope_sorted52024-02-21.txt:
-10. ASVrel.abund.pa.txt: This table is generated with script 6. It includes each ASV's average relative abundance, frequency, the slope of its relationship with function and its phylogenetic classification.  
-11. ASVlist2.txt: This table is generated with script 6. It includes each ASV's code, average relative abundance, phylogenetic affiliations and its identifier sequence.
-
-
+Data files product of data analysis are stored in the output_table/ folder:  
+9. ASVslope_sorted52024-02-21.txt:  
+10. ASVrel.abund.pa.txt: This table is generated with script 6. It includes each ASV's average relative abundance, frequency, the slope of its relationship with function and its phylogenetic classification. 
+11. ASVlist2.txt: This table is generated with script 6. It includes each ASV's code, average relative abundance, phylogenetic affiliations and its identifier sequence. 
 
 ## Script descriptions
 These scripts process data to generate the figures and statistical tests for the main text:
@@ -65,15 +63,15 @@ These scripts process data to generate the figures and statistical tests for the
 6. Fig5_FunASV_plotprep.R: This script prepares data to create figures to identify ASV underlying function. It relies on data file 1, 7 and 9. This scripts generates data files 9 and 10, required for script 7.
 7. Fig5_FunASV_plot.R: This script generates Figure 5. Using data files 9, 10, and 11. Data files 10 and 11 are generated with script 6, make sure to run it before script 7.
 
-These scripts process data to generate supplementary materials:
+These scripts process data to generate supplementary materials:  
 8. FigS1and2_DivBaseline.R: This script generates figure S1 and 2. It performs the associated statistical testing. Requires data files 2, 3 and 8.
 9. FigS3_and stats_FunAge_noOld.R: This script generates figure 3 and performs the associated statistical tests. It requires data files 4 and 5. 
 
-SOFTWARE VERSIONS
+# SOFTWARE VERSIONS
 The software and package versions can be found in the [session information](https://github.com/catalicu/FunExp/blob/main/sessionInfo_funexp04242025.txt) file. 
 
-REFERENCES
-[references to papers referred to in this repository, if any]
+# REFERENCES
+See full manuscritp for list of references.
 
 
 
