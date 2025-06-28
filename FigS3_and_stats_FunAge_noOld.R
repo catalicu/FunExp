@@ -4,11 +4,7 @@
 
 # Libraries
 library(ggplot2)
-library(vegan)
 library(dplyr)
-library(lme4)
-library(nlme)
-library(gridExtra)
 library(car)
 
 # Plot themes

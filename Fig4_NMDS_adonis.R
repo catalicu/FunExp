@@ -10,13 +10,6 @@
 # Libraries
 library(ggplot2)
 library(vegan)
-#library(plyr)
-#library(lme4)
-#library(nlme)
-#library(gridExtra)
-#library(reshape2)
-#library(car)
-#library(MASS)
 
 # Plot themes
 ## With legend
@@ -27,7 +20,6 @@ Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fi
 
 # load datasets
 ASVtable=read.table('input_data/ASVtable_FunExp12021-03-24.txt', header=TRUE)
-#TAXtable=read.table('input_data/TAXtable_FunExp12021-03-24.txt', header=TRUE)
 meta.table=read.table('input_data/METAtable_FunExp12021-03-24_sampleNamesFIX.txt', header=TRUE)
 
 # edit datasets for multivariate analyses
@@ -95,15 +87,39 @@ for(g in levels(NMDS.table$group)){
 }
 
 # full plot
-ggplot(data = NMDS.table, aes(NMDS1, NMDS2)) + geom_point(size=3,shape=21, aes(fill=(group))) +
-  geom_path(data=df_ell, aes(x=NMDS1, y=NMDS2,colour=group), size=0.5, linetype=2)+
-  annotate("text",x=NMDS.mean$NMDS1,y=NMDS.mean$NMDS2,label=NMDS.mean$group, size=2) + Theme + ggtitle('automatic colors')
-
-ggplot(meta.table2.nmds, aes(NMDS1, NMDS2)) + geom_point(size=3, aes(fill=(leaf_age_weeks), shape=treatment)) + 
-  Theme + scale_shape_manual(values=c(21,22)) +scale_fill_gradient(low='blue', high='red') + 
+ggplot(meta.table2.nmds, aes(NMDS1, NMDS2)) + 
+  geom_point(size=3, aes(fill=factor(leaf_age_weeks), shape=treatment)) + Theme2 + 
+  scale_shape_manual(values=c(21,22)) +#scale_fill_gradient(low='blue', high='red') + 
   geom_path(data=df_ell, aes(x=NMDS1, y=NMDS2,colour=group), size=0.5, linetype=2) + 
-  annotate("text",x=NMDS.mean$NMDS1,y=NMDS.mean$NMDS2,label=NMDS.mean$group, size=2) + 
-  ggtitle('color formatting from first figure')
+  annotate("text",x=NMDS.mean$NMDS1,y=NMDS.mean$NMDS2,label=NMDS.mean$group, size=4) +
+  scale_fill_manual(values=c('black', 'dark blue', 'light blue', 'dark green', 'green', 'white', 'grey','yellow', 'orange', 'red')) +
+  scale_color_manual(values=c('black', 'dark blue', 'light blue', 'dark green', 'green','white', 'grey', 'yellow', 'orange', 'red')) 
+
+
+# Plot nmds against function:Fig S4
+## import the function data and merge with the metadata table
+fun.table=read.table('input_data/FunExp_metadata.txt', header=TRUE)
+colnames(fun.table)[3]=  colnames(meta.table2.nmds)[2]
+funmeta.table=left_join(fun.table, meta.table2.nmds)
+funmeta.table2=funmeta.table[-which(is.na(funmeta.table[,10])),]
+
+divfun_sup_nmdsplo1=ggplot(funmeta.table2, aes(x=NMDS1, y=W_Change)) + 
+  geom_point(aes(color=factor(leaf_age_weeks))) + Theme2 + ylab('Weigth loss (g)') +
+  scale_color_manual(values=c('black', 'dark blue', 'light blue', 'dark green', 'green', 'white', 'grey','yellow', 'orange', 'red')) 
+
+
+divfun_sup_nmdsplot2=ggplot(funmeta.table2, aes(x=NMDS2, y=W_Change)) + 
+  geom_point(aes(color=factor(leaf_age_weeks))) + Theme2 + ylab('Weigth loss (g)') +
+  scale_color_manual(values=c('black', 'dark blue', 'light blue', 'dark green', 'green', 'white', 'grey','yellow', 'orange', 'red')) 
+
+quartz(width=7.5, height=3.5)
+grid.arrange(divfun_sup_nmdsplo1, divfun_sup_nmdsplot2, ncol=2)
+#quartz.save('/Figures/FigS4_NMDSaxis.pdf')
+
+summary(lm(W_Change ~ NMDS1 * leaf_age_weeks, data=funmeta.table2))
+summary(lm(W_Change ~ NMDS2 * leaf_age_weeks, data=funmeta.table2))
+
+# no significant trends - Fig S4
 
 # distance analysis
 dists=vegdist(ASVtable2, method='bray')

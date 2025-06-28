@@ -1,0 +1,293 @@
+---
+title: "FunASV_v8_taxAnalysis_abund-functB"
+date: "2022-12-23"
+output: 
+  html_document:
+    toc: TRUE
+---
+## Identifying ASV contributions to function in FunExp
+The goal of this script is to establish the trends in community composition change along the successional processes in Sarracenia purpurea microbial community - with a focus on single species or taxon. Then, we establish their likely functional contribution using functional means.
+
+This analysis goes along a functional analysis of the communities ability to degrade insect prey.
+
+To this aim, the species abundance data is sorted into a long format for iterative GLMs. This will identify species that increase with leaf age. Then, these select species are regressed against functional means to ascertain which ones are most likely contributing to degradative functions. 
+
+## Preparation
+### Load libraries and establish a plotting theme
+```{r message=FALSE}
+# Libraries
+library(ggplot2)
+#library(vegan)
+#library(dplyr)
+#library(lme4)
+#library(nlme)
+library(gridExtra)
+#library(reshape2)
+#library(car)
+#library(MASS)
+
+# Plot themes
+## With legend
+Theme=theme_classic(base_size=11, base_family="Helvetica") +
+	theme(axis.line = element_line(size = 1, colour = "black", linetype = "solid")) +theme(plot.title = element_text(size = 12))
+## Without legends
+Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fill=NA))
+```
+
+Set up the saving parameters: an path for the folder and the date and time for unique files.
+```{r}
+outPATH='output_files/'
+date=Sys.Date()
+```
+
+### Second, load the datasets: these files come from the seq processing script. This could be changed by params in the markdown file that are part of the user input.
+These are hashed because they are not immediately needed. Delete if definitely not needed. 
+```{r}
+#ASVtable=read.table('output_files_fromPhyloseq/ASVtable_FunExp12021-03-24.txt', header=TRUE)
+#TAXtable=read.table('output_files_fromPhyloseq/TAXtable_FunExp12021-03-24.txt', header=TRUE)
+#meta.table_errors=read.table('output_files_fromPhyloseq/METAtable_FunExp12021-03-24.txt', header=TRUE)
+#meta.table=read.table('output_files_fromPhyloseq/METAtable_FunExp12021-03-24_sampleNamesFIX.txt', header=TRUE)
+```
+
+### Obtain functional data
+Import the tables and code from FunASV_v4_taxFunct2, but further processed and cleand in FunASV_v9_taxFunct2_datacleaning:
+* ASVtable.fundiv contains ASV(code) relative abundances, functional data and diversity data for each sample
+* taxtable contains taxonomic affiliation per ASVcode
+```{r}
+ASVtable.fundiv=read.table('output_files/ASVtable_forGLM_FunExp12023-01-04.txt', header=TRUE)
+  ASVtable.fundiv1=ASVtable.fundiv[,-1]
+taxatable=read.table('output_files/taxtable_FunExp12023-01-04.txt', header=TRUE)
+
+```
+
+## Funct-Abund Modeling
+In the following lines of code, I will establish the best model based on select ASVs and then define a function that iterates the statistical model evaluation and p value correction across all ASVs. 
+
+### 1. Establish the data distribution with one ASV
+To explore the GLM, first I ll try it out with one ASV. 
+This code will select one from the table, and clean the data for further testing.
+```{r}
+# create list of ASV:
+ASVfun_names=names(ASVtable.fundiv1)
+i=7 # select the first ASV
+ASVdataFun=(ASVtable.fundiv1[,c(i,1377:1393)])
+  # Rename the column for the selected taxa
+  names(ASVdataFun)[1]='ASVrelabun'
+  # skip columns with 0 appearances
+  if (sum(ASVdataFun[1])<1) {print('empty column')} 
+  # Remove lines with zero abundance
+  if (length(which(ASVdataFun$ASVrelabun==0))>0) {
+      ASVdataFun=ASVdataFun[-which(ASVdataFun$ASVrelabun==0),]} 
+  # Remove lines with NA for W_Change (function)
+  if (length(is.na(ASVdataFun$W_Change))>0) {
+      ASVdataFun=ASVdataFun[-which(is.na(ASVdataFun$W_Change)),]} 
+```
+Test the model:
+```{r}
+mod.lm.null=lm(W_Change~1, data=ASVdataFun)
+  mod.lm.fun=lm(W_Change~ASVrelabun, data=ASVdataFun)
+  mod.glm.fun.gaus1=glm(W_Change~ASVrelabun, data=ASVdataFun)
+    mod.glm.fun.gaus2=glm(W_Change~ASVrelabun+treatment, data=ASVdataFun)
+    mod.glm.fun.gaus3=glm(W_Change~ASVrelabun+leaf_age_weeks, data=ASVdataFun)
+    mod.glm.fun.gaus4=glm(W_Change~ASVrelabun+richness, data=ASVdataFun)
+  mod.glm.fun.pois=glm(W_Change~ASVrelabun, data=ASVdataFun, poisson(link='log'))
+  #mod.glmnb.fun=glm.nb(W_Change~ASVrelabun, data=ASVdataFun)
+AIC(mod.lm.null, mod.lm.fun, mod.glm.fun.gaus1,mod.glm.fun.gaus2,mod.glm.fun.gaus3,mod.glm.fun.gaus4, mod.glm.fun.pois) #, #mod.glmnb.fun)
+```
+
+Plot the data
+```{r}
+ # Create a plot
+    ggplot(ASVdataFun, aes(log(ASVrelabun), W_Change)) + geom_point(aes(color=leaf_age_weeks, shape=treatment)) + geom_smooth(method='lm', se=FALSE, color='black', linewidth=0.5) +Theme
+```
+
+### 2. Iterate the GLM:
+Now build an iterative model function:
+* glm (gaussian distribution) vs null model
+* Store the model's outputs and the comparison with the null. 
+
+Input:
+* wide format dataset with ASV, fundiv data: ASVtable.fundiv1
+* list of taxa with number, DNA sequence, taxonomic affiliation and organized from more abundant to least abundant: taxatable
+
+```{r echo=FALSE, include=FALSE}
+IterativeGLM_Fun <- function(ASVfun, taxatable){
+  ASVfun_names=names(ASVfun)[1:1375]
+# create objects to store model results
+  model.glmFun.results=c() # store model coefficients and output
+  model.glmFun.evaluation=c() # store comparison between models
+
+for (i in 1:length(ASVfun_names)) {
+  ASVdataFun=(ASVfun[,c(i,1376:1393)])
+  names(ASVdataFun)[1]='ASVrelabun'
+  
+    # skip columns with 0 to 4 appearances
+  ASVdataFun_presence=ASVdataFun[1]
+  ASVdataFun_presence[which(ASVdataFun_presence>1),]=1
+  if (sum(ASVdataFun_presence)<5) {print('low occurrence (<2)')} else {
+      
+    tax_rownum=which(taxatable$ASVcode==ASVfun_names[i])
+  
+    # data clean up steps   
+        if (length(which(ASVdataFun$ASVrelabun==0))>0) {
+          ASVdataFun=ASVdataFun[-which(ASVdataFun$ASVrelabun==0),] } else {print('nope')}
+        if (length(which(is.na(ASVdataFun$W_Change)))>0) {
+          ASVdataFun=ASVdataFun[-which(is.na(ASVdataFun$W_Change)),] } else {print('nope2')}
+  
+    # Check progress
+      print(paste('Progress:', (ASVfun_names[i]), 
+        (taxatable$Family[tax_rownum]),
+        (taxatable$Genus[tax_rownum]), sep=' '))
+  
+    # Model runs
+      # GLM with gaussian distribution
+        Mod.fun1=lm(W_Change ~ ASVrelabun, data=ASVdataFun)
+	  		  Mod1.summary=summary(Mod.fun1)
+		  	  Mod1.coeff=Mod1.summary$coefficients
+	    # Null model
+	      Mod.null=glm(W_Change ~ 1, data=ASVdataFun)
+	  
+      # Model comparison
+		    Mod1.aov=anova(Mod.fun1, Mod.null, test='Chisq')
+		    aic.model=AIC(Mod.fun1,Mod.null)		
+  
+	  # Store coefficients
+		  coeff.full.model = data.frame((Mod1.summary$coefficients), 
+		                              adj.p=p.adjust(Mod1.summary$coefficients[,2]), 
+		                              Family=rep(taxatable$Family[tax_rownum],2),
+		                              Genus=rep(taxatable$Genus[tax_rownum],2),
+		                              ASVcode=rep(ASVfun_names[i],2), 
+		                              ASVseq=rep(taxatable$ASVseq[tax_rownum], 2)) 
+	  # Store comparison
+		  coeff.aov = data.frame(model=c(paste(ASVfun_names[tax_rownum], 'null.model', sep='_'),
+		                               paste(ASVfun_names[tax_rownum], 'full.model', sep='_')), 
+		                       resid.df=Mod1.aov[1], resid.dev=Mod1.aov[2], deviance=Mod1.aov[[4]], 
+		                       AIC=aic.model$AIC, chisq.p=Mod1.aov[[5]], adj.p=p.adjust(Mod1.aov[[5]]), 
+		                       Family=rep(taxatable$Family[tax_rownum],2) ,
+		                       Genus=rep(taxatable$Genus[tax_rownum],2), 
+		                       ASVcode=rep(ASVfun_names[i],2),
+		                       ASVseq=rep(taxatable$ASVseq[tax_rownum],2))		
+	
+	  # format results table
+		  model.glmFun.results=(rbind(model.glmFun.results, coeff.full.model)) 		
+		  model.glmFun.evaluation=(rbind(model.glmFun.evaluation, coeff.aov))		
+                                                }
+                                  }
+    # Finalize output:
+    dim(model.glmFun.results) # check for expected dimensions
+    # Add names to the columns of output tables:
+    names(model.glmFun.results)=c('Estimate', 'Serror', 't.value', 'p.value', 'p.adjust','Family', 'Genus', 'ASVcode','ASVseq')
+    names(model.glmFun.evaluation)=c('Model', 'df', 'Resid.dev', 'Deviance',  'AIC', 'p.value','adjust.p', 'Family', 'Genus', 'ASVcode','ASVseq')
+    
+    # Store both objects within a list
+    model.results.output.glmFun=list(coefficients=model.glmFun.results, evaluation=model.glmFun.evaluation)
+
+return(model.results.output.glmFun)
+}
+```
+
+### 3. Run model
+Run the function with all ASVs
+```{r include=FALSE}
+model.results.trial1=IterativeGLM_Fun(ASVtable.fundiv1, taxatable)
+```
+
+Clean and save the output of the function: these tables will go to supplementary materials. 
+```{r eval=FALSE}
+models.coefficients1 = model.results.trial1$coefficients
+models.evals1 = model.results.trial1$evaluation
+
+    glm.models.coeff = paste(outPATH, 'ASV_glm_coefficients_FunExp1', date,'.txt', sep='')
+    glm.models.evals = paste(outPATH, 'ASV_glm_evals_FunExp1', date,'.txt', sep='')
+
+	write.table(models.coefficients1, glm.models.coeff, sep="\t")
+		write.table(models.evals1, glm.models.evals, sep="\t")
+```
+
+### 4. Sort through the output tables:
+Save one list with those taxa that have significant positive slopes with function, and one of those who do not. 
+```{r include=FALSE}
+# create lists to store potential ASVs correlated with function
+list_asv_slopePos.Fun=c()
+list_asv_noslope.Fun=c()
+list_asv_slopeNeg.Fun=c()
+
+# list of ASV codes to go through:
+ASVfun_names=names(ASVtable.fundiv1)[1:1375]
+
+for (i in 1:length(ASVfun_names)){
+  # check that the ASV is present in the dataset
+  if (sum(which(models.coefficients1$ASVcode==ASVfun_names[i]))==0) { print(paste(ASVfun_names[i], 'ASV not found'))
+    } else {
+  
+    # extract the slope estimate:
+      ASVabund.estimate= models.coefficients1[which(models.coefficients1$ASVcode==ASVfun_names[i]),1][2]
+    # extract the p value:
+      ASVabund.p= models.coefficients1[which(models.coefficients1$ASVcode==ASVfun_names[i]),5][2]
+      ASVcode= models.coefficients1[which(models.coefficients1$ASVcode==ASVfun_names[i]),8][2]
+      ASVGenus= models.coefficients1[which(models.coefficients1$ASVcode==ASVfun_names[i]),6][2]
+      
+    # inform of progress:  
+      print(paste('Progress:', i, ASVcode, ASVGenus))
+    
+    # check that output differs from NA
+      if (is.na(ASVabund.p)) { 
+          print(paste(ASVfun_names[i], 'p value was NA'))
+          list_asv_noslope.Fun=rbind(list_asv_noslope.Fun, c(ASVfun_names[i], ASVabund.estimate, ASVabund.p))
+                             } else {
+        
+    # Sort the taxa
+      # if the taxa has a positive slope estimate and a significant adjusted p value -> accept and store ASVcode
+        if (ASVabund.estimate > 0 && ASVabund.p < 0.05 ) {
+          list_asv_slopePos.Fun=rbind(list_asv_slopePos.Fun, c(ASVfun_names[i], ASVabund.estimate, ASVabund.p))
+            } else   { 
+       # if the taxa has a negative slope estimate and a significant adjusted p value -> accept and store ASVcode
+        if (ASVabund.estimate < 0 && ASVabund.p < 0.05 ) {
+          list_asv_slopeNeg.Fun=rbind(list_asv_slopeNeg.Fun, c(ASVfun_names[i], ASVabund.estimate, ASVabund.p))
+            } else {
+       # store non significant and NA results ASV in noslope list
+        list_asv_noslope.Fun=c(list_asv_noslope.Fun, paste(ASVfun_names[i], ASVabund.estimate, ASVabund.p)) 
+                   }
+                    } 
+                                }
+                                }
+        }
+
+```
+
+#### Edit the sorted tables and save
+Change from matrix to data frame and add column names.
+Focus on negative and positive slopes from here on. 
+```{r}
+list_asv_slopePos.Fun.df=data.frame(list_asv_slopePos.Fun)
+  colnames(list_asv_slopePos.Fun.df)=c('ASVcode', 'ASVestimate', 'ASVp.value')
+  listPos.rank=list_asv_slopePos.Fun.df[order(list_asv_slopePos.Fun.df$ASVestimate),]
+  
+list_asv_slopeNeg.Fun.df=data.frame(list_asv_slopeNeg.Fun)
+  colnames(list_asv_slopeNeg.Fun.df)=c('ASVcode', 'ASVestimate', 'ASVp.value')
+  listNeg.rank=list_asv_slopeNeg.Fun.df[order(list_asv_slopeNeg.Fun.df$ASVestimate),]
+  
+list_asv_noslope.Fun.df=data.frame(list_asv_noslope.Fun)
+  colnames(list_asv_noslope.Fun.df)=c('ASVcode', 'ASVestimate', 'ASVp.value')
+  listnoslope.rank=list_asv_noslope.Fun.df[order(list_asv_noslope.Fun.df$ASVestimate),]
+```
+
+
+Merge the lists with their taxonomic affiliations
+```{r}
+listPos.rank_taxa=left_join(listPos.rank, taxatable)
+listnoslope.rank_taxa=left_join(listnoslope.rank, taxatable)
+listNeg.rank_taxa=left_join(listNeg.rank, taxatable)
+
+```
+Save them as a single table
+```{r}
+ ASVslope.sorted=rbind(
+    data.frame(Slope=rep('Positive',dim(listPos.rank_taxa)[1]), listPos.rank_taxa),
+    data.frame(Slope=rep('Neutral',dim(listnoslope.rank_taxa)[1]), listnoslope.rank_taxa),
+    data.frame(Slope=rep('Negative',dim(listNeg.rank_taxa)[1]), listNeg.rank_taxa))
+    
+ASVslope.sorted_path = paste(outPATH, 'ASVslope_sorted_FunExp1', date,'.txt', sep='')
+
+	write.table(ASVslope.sorted, ASVslope.sorted_path, sep="\t")
+```

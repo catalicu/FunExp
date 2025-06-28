@@ -5,12 +5,8 @@
 # Libraries
 library(vegan)
 library(car)
-#library(ggplot2)
-#library(plyr)
-#library(nlme)
-#library(gridExtra)
-#library(dplyr)
-
+library(ggplot2)
+library(gridExtra)
 
 # Plot themes
 ## With legend

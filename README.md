@@ -46,22 +46,28 @@ Data files are stored in the input_data folder:
 5. MetaDiv_table_FunExp12021-03-30.txt: Table listing each sample's diversity calculations, including Richness, Shannon and Simpson's index and Pielou's evenness. It contains 97 samples.  
 6. FunEx1_calculations.csv and FunEx2_calculations.csv: Datatables with calculated 16S rRNA gene copy counts from qPCR. 
 7. ASVtable_forGLM_FunExp12023-01-04.txt: This table includes ASV abundance data from data file 1 and Metadata table from data file 3 for each sample. It contains 97 samples.  
+8. Leavs_per_age.csv: This table lists information from individual leaves sampled from the field, before being pooled per age group. The dataset contains information on 457 leaves and includes each leave's age, band number (identifier tag), and fluid volume.  
 
 Data files product of data analysis are stored in the output_table/ folder:
-8. ASVslope_sorted52024-02-21.txt:
-9. ASVrel.abund.pa.txt: This table is generated with script 6. It includes each ASV's average relative abundance, frequency, the slope of its relationship with function and its phylogenetic classification.  
-10. ASVlist2.txt: This table is generated with script 6. It includes each ASV's code, average relative abundance, phylogenetic affiliations and its identifier sequence.
+9. ASVslope_sorted52024-02-21.txt:
+10. ASVrel.abund.pa.txt: This table is generated with script 6. It includes each ASV's average relative abundance, frequency, the slope of its relationship with function and its phylogenetic classification.  
+11. ASVlist2.txt: This table is generated with script 6. It includes each ASV's code, average relative abundance, phylogenetic affiliations and its identifier sequence.
 
 
 
 ## Script descriptions
+These scripts process data to generate the figures and statistical tests for the main text:
 1. Fig1_BEF_funexp_main_bDiv_cFun.R: This script creates the three panels for Fig 1. The input for this script includes data files 2, 3, 4 and 5.  
 2. Fig1_BEF_funexp_main_bDiv_cFun_Stats.R: Performs statistical testing to support patterns displayed in Fig1. Input used includes data files 2, 3, 4, and 5.  
 3. Fig2_FunExp_SEM2025.R: Performs SEM analysis and generates Figure 2. Input files are data files 3, and 4.  
 4. Fig3_qPCR_FunExp.Rmd: This script is in Rmarkdown. It creates figure 3 and performs statistical analyses associated with our qPCR data. It uses data file 6, as well as 2 and 7 for comparisons.  
-5. Fig4_NMDS_adonis.R: Performs multivariate analyses including perMANOVA, NMDS ordination and homogeneity of distances. Uses data files 2 and 3. 
-6. Fig5_FunASV_plotprep.R: This script prepares data to create figures to identify ASV underlying function. It relies on data file 1, 7 and 8. This scripts generates data files 9 and 10, required for script 7.
-7. Fig5_FunASV_plot.R: This script generates Figure 5. Using data files 8, 9, and 10. Data files 9 and 10 are generated with script 6, make sure to run it before script 7.
+5. Fig4_NMDS_adonis.R: Performs multivariate analyses including perMANOVA, NMDS ordination and homogeneity of distances. This code also generates Figure S4 and runs stats associated with it. Data files 2 and 3 are used here.  
+6. Fig5_FunASV_plotprep.R: This script prepares data to create figures to identify ASV underlying function. It relies on data file 1, 7 and 9. This scripts generates data files 9 and 10, required for script 7.
+7. Fig5_FunASV_plot.R: This script generates Figure 5. Using data files 9, 10, and 11. Data files 10 and 11 are generated with script 6, make sure to run it before script 7.
+
+These scripts process data to generate supplementary materials:
+8. FigS1and2_DivBaseline.R: This script generates figure S1 and 2. It performs the associated statistical testing. Requires data files 2, 3 and 8.
+9. FigS3_and stats_FunAge_noOld.R: This script generates figure 3 and performs the associated statistical tests. It requires data files 4 and 5. 
 
 SOFTWARE VERSIONS
 The software and package versions can be found in the [session information](https://github.com/catalicu/FunExp/blob/main/sessionInfo_funexp04242025.txt) file. 
