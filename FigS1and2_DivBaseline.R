@@ -103,6 +103,7 @@ all_richness=ggplot(meta.div, aes(treatment, richness)) +
   annotate('text', label='a.', x=0.8, y=115)
 
 # calculate nmds
+set.seed(123)
 NMDS.contr=metaMDS(ASVtable, k=3)
 meta.nmds=data.frame(meta.div, scores(NMDS.contr)$sites)
 
