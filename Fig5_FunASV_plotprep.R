@@ -9,17 +9,9 @@
   # * General patterns of ASV distribution and occurrences
 
 # Libraries
-#library(ggplot2)
 library(dplyr)
 library(plyr)
 library(reshape2)
-
-# Plot themes
-## With legend
-Theme=theme_classic(base_size=11, base_family="Helvetica") +
-  theme(axis.line = element_line(linewidth = 1, colour = "black", linetype = "solid")) +theme(plot.title = element_text(size = 12))
-## Without legends
-Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fill=NA))
 
 # Load data
 ASVtable.fundiv=read.table('input_data/ASVtable_forGLM_FunExp12023-01-04.txt', header=TRUE)
@@ -34,7 +26,6 @@ ASVtable=ASVtable.fundiv[,2:1376]
 metatable=ASVtable.fundiv[,1377:1394]
 
 # prep table for Fig5c
-# from v10:
 ### Calculate: mean abundance, occurrence and mean functional output per ASV
 
 # presence absence: occurrence
@@ -78,7 +69,6 @@ ASVrel.abund.pa.fun.sorted[which(is.na(ASVrel.abund.pa.fun.sorted$Slope)),6]='Un
 
 # Save this table:
 #write.table(ASVrel.abund.pa.fun.sorted, file='output_tables/ASVrel.abund.pa.txt', sep='\t')
-
 
 ### Melt the abundance data set into a long format
 

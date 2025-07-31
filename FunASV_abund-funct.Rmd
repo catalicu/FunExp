@@ -5,7 +5,7 @@ output:
   html_document:
     toc: TRUE
 ---
-## Identifying ASV contributions to function in FunExp
+## Evaluating ASV contributions to function in FunExp
 The goal of this script is to establish the trends in community composition change along the successional processes in Sarracenia purpurea microbial community - with a focus on single species or taxon. Then, we establish their likely functional contribution using functional means.
 
 This analysis goes along a functional analysis of the communities ability to degrade insect prey.
@@ -17,14 +17,8 @@ To this aim, the species abundance data is sorted into a long format for iterati
 ```{r message=FALSE}
 # Libraries
 library(ggplot2)
-#library(vegan)
-#library(dplyr)
-#library(lme4)
-#library(nlme)
 library(gridExtra)
-#library(reshape2)
-#library(car)
-#library(MASS)
+library(dplyr)
 
 # Plot themes
 ## With legend
@@ -36,72 +30,20 @@ Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fi
 
 Set up the saving parameters: an path for the folder and the date and time for unique files.
 ```{r}
-outPATH='output_files/'
+outPATH='output_tables/'
 date=Sys.Date()
 ```
 
-### Second, load the datasets: these files come from the seq processing script. This could be changed by params in the markdown file that are part of the user input.
-These are hashed because they are not immediately needed. Delete if definitely not needed. 
-```{r}
-#ASVtable=read.table('output_files_fromPhyloseq/ASVtable_FunExp12021-03-24.txt', header=TRUE)
-#TAXtable=read.table('output_files_fromPhyloseq/TAXtable_FunExp12021-03-24.txt', header=TRUE)
-#meta.table_errors=read.table('output_files_fromPhyloseq/METAtable_FunExp12021-03-24.txt', header=TRUE)
-#meta.table=read.table('output_files_fromPhyloseq/METAtable_FunExp12021-03-24_sampleNamesFIX.txt', header=TRUE)
-```
-
-### Obtain functional data
-Import the tables and code from FunASV_v4_taxFunct2, but further processed and cleand in FunASV_v9_taxFunct2_datacleaning:
+### Second, load the datasets:
 * ASVtable.fundiv contains ASV(code) relative abundances, functional data and diversity data for each sample
 * taxtable contains taxonomic affiliation per ASVcode
 ```{r}
-ASVtable.fundiv=read.table('output_files/ASVtable_forGLM_FunExp12023-01-04.txt', header=TRUE)
+ASVtable.fundiv=read.table('input_data/ASVtable_forGLM_FunExp12023-01-04.txt', header=TRUE)
   ASVtable.fundiv1=ASVtable.fundiv[,-1]
-taxatable=read.table('output_files/taxtable_FunExp12023-01-04.txt', header=TRUE)
-
+taxatable=read.table('input_data/taxtable_FunExp12023-01-04.txt', header=TRUE)
 ```
 
-## Funct-Abund Modeling
-In the following lines of code, I will establish the best model based on select ASVs and then define a function that iterates the statistical model evaluation and p value correction across all ASVs. 
-
-### 1. Establish the data distribution with one ASV
-To explore the GLM, first I ll try it out with one ASV. 
-This code will select one from the table, and clean the data for further testing.
-```{r}
-# create list of ASV:
-ASVfun_names=names(ASVtable.fundiv1)
-i=7 # select the first ASV
-ASVdataFun=(ASVtable.fundiv1[,c(i,1377:1393)])
-  # Rename the column for the selected taxa
-  names(ASVdataFun)[1]='ASVrelabun'
-  # skip columns with 0 appearances
-  if (sum(ASVdataFun[1])<1) {print('empty column')} 
-  # Remove lines with zero abundance
-  if (length(which(ASVdataFun$ASVrelabun==0))>0) {
-      ASVdataFun=ASVdataFun[-which(ASVdataFun$ASVrelabun==0),]} 
-  # Remove lines with NA for W_Change (function)
-  if (length(is.na(ASVdataFun$W_Change))>0) {
-      ASVdataFun=ASVdataFun[-which(is.na(ASVdataFun$W_Change)),]} 
-```
-Test the model:
-```{r}
-mod.lm.null=lm(W_Change~1, data=ASVdataFun)
-  mod.lm.fun=lm(W_Change~ASVrelabun, data=ASVdataFun)
-  mod.glm.fun.gaus1=glm(W_Change~ASVrelabun, data=ASVdataFun)
-    mod.glm.fun.gaus2=glm(W_Change~ASVrelabun+treatment, data=ASVdataFun)
-    mod.glm.fun.gaus3=glm(W_Change~ASVrelabun+leaf_age_weeks, data=ASVdataFun)
-    mod.glm.fun.gaus4=glm(W_Change~ASVrelabun+richness, data=ASVdataFun)
-  mod.glm.fun.pois=glm(W_Change~ASVrelabun, data=ASVdataFun, poisson(link='log'))
-  #mod.glmnb.fun=glm.nb(W_Change~ASVrelabun, data=ASVdataFun)
-AIC(mod.lm.null, mod.lm.fun, mod.glm.fun.gaus1,mod.glm.fun.gaus2,mod.glm.fun.gaus3,mod.glm.fun.gaus4, mod.glm.fun.pois) #, #mod.glmnb.fun)
-```
-
-Plot the data
-```{r}
- # Create a plot
-    ggplot(ASVdataFun, aes(log(ASVrelabun), W_Change)) + geom_point(aes(color=leaf_age_weeks, shape=treatment)) + geom_smooth(method='lm', se=FALSE, color='black', linewidth=0.5) +Theme
-```
-
-### 2. Iterate the GLM:
+### 1.Iterate the GLM:
 Now build an iterative model function:
 * glm (gaussian distribution) vs null model
 * Store the model's outputs and the comparison with the null. 
@@ -186,7 +128,7 @@ return(model.results.output.glmFun)
 }
 ```
 
-### 3. Run model
+### 2. Run model
 Run the function with all ASVs
 ```{r include=FALSE}
 model.results.trial1=IterativeGLM_Fun(ASVtable.fundiv1, taxatable)
@@ -200,11 +142,11 @@ models.evals1 = model.results.trial1$evaluation
     glm.models.coeff = paste(outPATH, 'ASV_glm_coefficients_FunExp1', date,'.txt', sep='')
     glm.models.evals = paste(outPATH, 'ASV_glm_evals_FunExp1', date,'.txt', sep='')
 
-	write.table(models.coefficients1, glm.models.coeff, sep="\t")
-		write.table(models.evals1, glm.models.evals, sep="\t")
+#write.table(models.coefficients1, glm.models.coeff, sep="\t")
+#write.table(models.evals1, glm.models.evals, sep="\t")
 ```
 
-### 4. Sort through the output tables:
+### 3. Sort through the output tables:
 Save one list with those taxa that have significant positive slopes with function, and one of those who do not. 
 ```{r include=FALSE}
 # create lists to store potential ASVs correlated with function
@@ -289,5 +231,5 @@ Save them as a single table
     
 ASVslope.sorted_path = paste(outPATH, 'ASVslope_sorted_FunExp1', date,'.txt', sep='')
 
-	write.table(ASVslope.sorted, ASVslope.sorted_path, sep="\t")
+	#write.table(ASVslope.sorted, ASVslope.sorted_path, sep="\t")
 ```

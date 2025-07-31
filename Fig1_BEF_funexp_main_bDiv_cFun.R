@@ -10,6 +10,7 @@
 # Libraries
 library(ggplot2)
 library(dplyr)
+library(outliers)
 library(effects)
 library(vegan)
 library(patchwork)
@@ -27,11 +28,9 @@ Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fi
 
 ASVtable=read.table('input_data/ASVtable_FunExp12021-03-24.txt', header=TRUE)
 meta.table=read.table('input_data/METAtable_FunExp12021-03-24_sampleNamesFIX.txt', header=TRUE)
-
-div.table=read.table('input_data/MetaDiv_table_FunExp12021-03-30.txt', header=TRUE)
-colnames(div.table)[2]='Treatment' # create columns with same names for left_join
-
 fun.table=read.table('input_data/FunExp_metadata.txt', header=TRUE)
+div.table=read.table('input_data/MetaDiv_table_FunExp12021-03-30.txt', header=TRUE)
+  colnames(div.table)[2]='Treatment' # create columns with same names for left_join
 
 # Merge diversity and functional data and make sure weeks are numeric
 fundiv.table=left_join(fun.table, div.table)
@@ -45,14 +44,15 @@ fundiv.table_BEF2=fundiv.table_BEF1[-which(fundiv.table_BEF1$W_Change==min(fundi
 boxplot(fundiv.table_BEF1$richness, main = "Boxplot of MPG", col = "lightblue")
   grubbs.test(fundiv.table_BEF1$richness)
 fundiv.table_BEF=fundiv.table_BEF2[-which(fundiv.table_BEF2$richness==(max(fundiv.table_BEF2$richness))),]
+fundiv.table_BEF$log_richness=log(fundiv.table_BEF$richness)
 
 # model selected out of options 
-mod.rich7=glm(W_Change~log(richness)*(leaf_age_weeks), data=fundiv.table_BEF, family=Gamma(link='log'))
-effect_data=data.frame(effect('log(richness)', mod.rich7)) # predict on one variable of a model
+mod.rich7=glm(W_Change~log_richness*(leaf_age_weeks), data=fundiv.table_BEF, family=Gamma(link='log'))
+effect_data=data.frame(effect('log_richness', mod.rich7)) # predict on one variable of a model
 
-BEFmain_fig= ggplot(fundiv.table_BEF, aes(log(richness), W_Change)) + 
+BEFmain_fig= ggplot(fundiv.table_BEF, aes(log_richness, W_Change)) + 
   geom_jitter(color='black',shape=21, aes(size=leaf_age_weeks, fill=treatment))+ 
-  geom_line(data=effect_data, aes(x=log(richness), y=fit), 
+  geom_line(data=effect_data, aes(x=log_richness, y=fit), 
             linetype='dashed', linewidth=1) +
   Theme2 + xlab('log(number of ASV)') + 
   ylab('Weight change (g)') + 
@@ -80,7 +80,7 @@ meta.table2=meta.table[-c(which(meta.table$treatment=='F50'),
 ASVtable2=ASVtable[-c(which(meta.table$treatment=='F50'),
                       which(meta.table$treatment=='water_control')),]
 
-# Calculate diversity metrics
+# Re-Calculate diversity metrics
 richness=specnumber(ASVtable)
 shannon=diversity(ASVtable, index='shannon')
 simpson=diversity(ASVtable, index='simpson')

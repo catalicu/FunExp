@@ -10,6 +10,8 @@
 # Libraries
 library(ggplot2)
 library(vegan)
+library(dplyr)
+library(gridExtra)
 
 # Plot themes
 ## With legend
@@ -54,6 +56,7 @@ adonis1=adonis2(ASVtable2~leaf_age_weeks*treatment, data=meta.table2)
 adonis2=adonis2(t(ASVtable2.t.wtzero)~leaf_age_weeks*treatment, data=meta.table2) 
 
 # calculate NMDS scores per sample
+set.seed(123)
 NMDS.mod1=metaMDS(ASVtable2.t.wtzero, k=3, distance ='bray', trymax = 50)
 meta.table2.nmds=data.frame(meta.table2, scores(NMDS.mod1)$species)
 
@@ -72,15 +75,17 @@ ggplot(meta.table2.nmds, aes(NMDS1, NMDS2)) +
   scale_fill_gradient(low='blue', high='red') 
 
 # Prepare for the ordihull
-NMDS.table = data.frame(NMDS1 = meta.table2.nmds$NMDS1, 
-                        NMDS2 = meta.table2.nmds$NMDS2,
-                        group=factor(meta.table2.nmds$leaf_age))
-NMDS.mean=aggregate(NMDS.table[,1:2],list(group=NMDS.table$group),mean)
+meta.table2.nmds2=meta.table2.nmds[-which(meta.table2.nmds$leaf_age=='A08'),]
+NMDS.table2 = data.frame(NMDS1 = meta.table2.nmds2$NMDS1, 
+                        NMDS2 = meta.table2.nmds2$NMDS2,
+                        group=factor(meta.table2.nmds2$leaf_age))
+
+NMDS.mean=aggregate(NMDS.table2[,1:2],list(group=NMDS.table2$group),mean)
 df_ell <- data.frame()
 
-for(g in levels(NMDS.table$group)){
+for(g in levels(NMDS.table2$group)){
   #g='A10'
-  df_ell <- rbind(df_ell, cbind(as.data.frame(with(NMDS.table[NMDS.table$group==g,],
+  df_ell <- rbind(df_ell, cbind(as.data.frame(with(NMDS.table2[NMDS.table2$group==g,],
               veganCovEllipse(cov.wt(cbind(NMDS1,NMDS2),wt=rep(1/length(NMDS1),
               length(NMDS1)))$cov,center=c(mean(NMDS1),mean(NMDS2)))))
                                 ,group=g))

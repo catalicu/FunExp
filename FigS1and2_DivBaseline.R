@@ -7,6 +7,7 @@ library(vegan)
 library(car)
 library(ggplot2)
 library(gridExtra)
+library(dplyr)
 
 # Plot themes
 ## With legend
@@ -72,7 +73,7 @@ eve_regional=ggplot(Baseline, aes(leaf_age_weeks, evenness))  +
 Fig_divControl=arrangeGrob(rich_regional, rich_local, eve_regional, ncol=2)
 quartz(width=6, height=6)
 plot(Fig_divControl)
-quartz.save('Figures/Fig_div_time_baselinecontrols.png', type='png', dpi=300)
+#quartz.save('Figures/Fig_div_time_baselinecontrols.png', type='png', dpi=300)
 
 # stats
 # rich regional: stats for Fig S1a
@@ -115,7 +116,7 @@ all_nmds=ggplot(meta.nmds, aes(NMDS1, NMDS2)) +
 Fig_all=arrangeGrob(all_richness, all_nmds, ncol=1)
 quartz(width=5, height=7)
 plot(Fig_all)
-quartz.save('Figures/Fig_all_baselineandtreatments.png', type='png', dpi=300)
+#quartz.save('Figures/Fig_all_baselineandtreatments.png', type='png', dpi=300)
 
 # stats
 # all richness data: stats for fig2a

@@ -19,7 +19,7 @@ Theme=theme_classic(base_size=11, base_family="Helvetica") +
 ## Without legends
 Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fill=NA))
 
-# Load data - from 'Fig6_FunASV_plotprep.R' 
+# Load data - from 'Fig5_FunASV_plotprep.R' 
 ASVlist2.div=read.table('output_tables/ASVlist2.txt', header=TRUE)
 ASVrel.abund.pa.fun.sorted=read.table('output_tables/ASVrel.abund.pa.txt', header=TRUE)
 
@@ -41,7 +41,6 @@ avFunASV=ggplot(ASVselect, aes(ASVcode, ASVfunRat)) + geom_col(color='black', ae
   annotate('text', x=0.7, y=1.1, label='b.')
 
 
-Fig6=arrangeGrob(ASVrel.abund.pa_plot_d, avFunASV, ncol=2)
+Fig5=arrangeGrob(ASVrel.abund.pa_plot_d, avFunASV, ncol=2)
 quartz(width = 9, height=4.5)
-plot(Fig6)
-quartz.save('Figures/Fig6.png', type='png', dpi=300)
+plot(Fig5)

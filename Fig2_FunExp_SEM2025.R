@@ -9,13 +9,11 @@
 # This script performs the SEM analysis and generates Figure 2.
 
 # Preparation
-
 # Libraries
 library(dplyr)
 library(lavaan)
 library(lavaanPlot)
 library(ggplot2)
-library(semPaths)
 
 # Plot themes
 ## With legend

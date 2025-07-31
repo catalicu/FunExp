@@ -14,16 +14,14 @@
 # Load libraries
 library(dplyr)
 library(vegan)
+library(car)
 
 # Load tables
 ASVtable=read.table('input_data/ASVtable_FunExp12021-03-24.txt', header=TRUE)
-#TAXtable=read.table('input_data/TAXtable_FunExp12021-03-24.txt', header=TRUE)
 meta.table=read.table('input_data/METAtable_FunExp12021-03-24_sampleNamesFIX.txt', header=TRUE)
-
-div.table=read.table('input_data/MetaDiv_table_FunExp12021-03-30.txt', header=TRUE)
-colnames(div.table)[2]='Treatment'
-
 fun.table=read.table('input_data/FunExp_metadata.txt', header=TRUE)
+div.table=read.table('input_data/MetaDiv_table_FunExp12021-03-30.txt', header=TRUE)
+  colnames(div.table)[2]='Treatment'
 
 # Merge diversity and functional data and make sure weeks are numeric
 fundiv.table=left_join(fun.table, div.table)
@@ -44,17 +42,17 @@ fundiv.table_BEF=fundiv.table_BEF2[-which(fundiv.table_BEF2$richness==(max(fundi
 # treatment as a factor.
 mod.rich.null=lm(W_Change~1, data=fundiv.table_BEF2)
 mod.rich.null.gamma=glm(W_Change~1, data=fundiv.table_BEF2, family=Gamma(link='log'))
-mod.rich=lm(W_Change~log(richness+1)*leaf_age_weeks*treatment, data=fundiv.table_BEF)
-mod.rich2=lm(W_Change~(richness)*leaf_age_weeks*treatment, data=fundiv.table_BEF)
-mod.rich3=lm(W_Change~(richness)*treatment, data=fundiv.table_BEF)
-mod.rich3b=lm(W_Change~log(richness)*treatment, data=fundiv.table_BEF)
-mod.rich4=lm(W_Change~(richness)*leaf_age_weeks, data=fundiv.table_BEF)
-mod.rich4b=lm(W_Change~log(richness)*leaf_age_weeks, data=fundiv.table_BEF)
-mod.rich5=lm(W_Change~(richness), data=fundiv.table_BEF)
-mod.rich6=lm(W_Change~log(richness), data=fundiv.table_BEF)
+mod.rich=lm(W_Change~log(richness+1)*leaf_age_weeks*treatment, data=fundiv.table_BEF2)
+mod.rich2=lm(W_Change~(richness)*leaf_age_weeks*treatment, data=fundiv.table_BEF2)
+mod.rich3=lm(W_Change~(richness)*treatment, data=fundiv.table_BEF2)
+mod.rich3b=lm(W_Change~log(richness)*treatment, data=fundiv.table_BEF2)
+mod.rich4=lm(W_Change~(richness)*leaf_age_weeks, data=fundiv.table_BEF2)
+mod.rich4b=lm(W_Change~log(richness)*leaf_age_weeks, data=fundiv.table_BEF2)
+mod.rich5=lm(W_Change~(richness), data=fundiv.table_BEF2)
+mod.rich6=lm(W_Change~log(richness), data=fundiv.table_BEF2)
 mod.rich7=glm(W_Change~(richness)*(leaf_age_weeks), data=fundiv.table_BEF2, family=Gamma(link='log'))
-mod.rich8=glm(W_Change~log(richness)*(leaf_age_weeks)*treatment, data=fundiv.table_BEF, family=Gamma(link='log'))
-mod.rich9=glm(W_Change~log(richness)*(leaf_age_weeks)+treatment, data=fundiv.table_BEF, family=Gamma(link='log'))
+mod.rich8=glm(W_Change~log(richness)*(leaf_age_weeks)*treatment, data=fundiv.table_BEF2, family=Gamma(link='log'))
+mod.rich9=glm(W_Change~log(richness)*(leaf_age_weeks)+treatment, data=fundiv.table_BEF2, family=Gamma(link='log'))
 
 #Test the models:
 # lowest AIC

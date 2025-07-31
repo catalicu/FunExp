@@ -1,0 +1,264 @@
+---
+title: "FunExp_TaxAnalysis_v11_taxAnalysis_time-abundance"
+author: "Dr CG"
+date:"1/13/2023"
+output: 
+  html_document:
+    toc: TRUE
+---
+## Evaluating ASV contributions to function in FunExp, while considering time
+The goal of this script is to establish the trends in community composition change along the successional processes in Sarracenia purpurea microbial community - with a focus on single species or taxon. Then, we establish their likely functional contribution using functional means.
+
+This analysis goes along a functional analysis of the communities ability to degrade insect prey.
+
+To this aim, the species abundance data is sorted into a long format for iterative GLMs. This will identify species that increase with leaf age. Then, these select species are regressed against functional means to ascertain which ones are most likely contributing to degradative functions. 
+
+## Preparation
+### Load libraries and establish a plotting theme
+```{r message=FALSE}
+# Libraries
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+library(MASS)
+library(reshape2)
+
+# Plot themes
+## With legend
+Theme=theme_classic(base_size=11, base_family="Helvetica") +
+	theme(axis.line = element_line(size = 1, colour = "black", linetype = "solid")) +theme(plot.title = element_text(size = 12))
+## Without legends
+Theme2=Theme+ theme(legend.position="none") + theme(panel.border=element_rect(fill=NA))
+```
+Set up the saving parameters: an path for the folder and the date and time for unique files.
+```{r}
+outPATH='output_tables/'
+date=Sys.Date()
+```
+
+### Second, load the datasets: 
+Import the tables and code from FunASV_v4_taxFunct2:
+* ASVtable.fundiv contains ASV(code) relative abundances, functional data and diversity data for each sample
+* taxtable contains taxonomic affiliation per ASVcode
+```{r}
+ASVtable.fundiv=read.table('input_data/ASVtable_forGLM_FunExp12023-01-04.txt', header=TRUE)
+  ASVtable.fundiv1=ASVtable.fundiv[,-1]
+taxatable=read.table('input_data/taxtable_FunExp12023-01-04.txt', header=TRUE)
+ASVlist2=read.table('output_tables/ASVlist2.txt')
+```
+
+#### Obtain ranking data
+Load the information on taxon classification according to their relationship with function
+```{r}
+ASVslope_sorted=read.table('output_tables/ASVslope_sorted52024-02-21.txt', header=TRUE)
+```
+
+### prepare datasets
+Before melting, reduce the dataset to taxa that we were able to relate to function (in scritp v8)
+```{r}
+# select the columns that will go into the long format:
+  # include treatment, leaf age, and taxa that were related to function
+ASVfor_melt=ASVtable.fundiv[,c(which(colnames(ASVtable.fundiv)%in%(ASVslope_sorted$ASVcode)),1387,1389)]
+```
+
+First you must join the ASV table and the metadata table in long format. Each datapoint (counts or rel abundance) should have a row now.
+```{r}
+	# Then use melt to go from the wide table format to the long table format. 
+otumelt_fun=melt(ASVfor_melt, id=c("treatment", "leaf_age_weeks"))
+length(names(otumelt_fun))
+names(otumelt_fun)[(length(names(otumelt_fun))-1):length(names(otumelt_fun))]=c("ASVcode", "Abundance") # the last two columns will represent the ASV code an the abundance value 
+head(otumelt_fun)
+```
+
+Clean the tax table to add tax information to the long version of the ASV table with metadata (otumelt)
+```{r}
+otumelt2=left_join(otumelt_fun, taxatable,  by='ASVcode')
+
+# make sure the relative abundance column is numeric
+otumelt2$Abundance=as.numeric(as.character(otumelt2$Abundance))
+
+# remove rows with no information in the treatment and leaf age (where did these come from?)
+otumelt3=otumelt2[-which(is.na(otumelt2$treatment)),]
+head(otumelt3)
+```
+
+### Iterative GLM model
+Now build an iterative model function:
+* glm (poisson distribution) vs null model
+* Store the model's outputs and the comparison with the null. 
+(I had a note about using the Gauss-Hermite quadrature GHQ method with one iteration but no idea what that is)
+Possibilities: 
+(Could also have if else statements to remove low abundance or occurrence)
+(Could use a GLM negative binomial (glm.nb))
+
+Input:
+* long format dataset with ASV and metadata: otumelt3
+* list of taxa with number, DNA sequence, taxonomic affiliation and organized from more abundant to least abundant: ASVlist2
+
+```{r eval=FALSE}
+IterativeGLM1 <- function(long_data, ASVlist2){
+  model.results.otuA=c() # store model coefficients and output
+  model.evaluation.otuA=c() # store comparison between models
+  
+for (i in 1:length(ASVlist2$ASVcode)){
+  # extract data
+	OTUdata=long_data[which(long_data$ASVcode%in%ASVlist2$ASVcode[i]),] 
+	OTUdata2=OTUdata 
+			# GLM with Poisson distribution
+			Mod1=glm.nb(Abundance ~ leaf_age_weeks, data=OTUdata2)
+				Mod1.summary=summary(Mod1)
+					Mod1.coeff=Mod1.summary$coefficients
+			# Null model
+			Mod1.null=glm.nb(Abundance ~ 1, data=OTUdata2)
+				Mod1.aov=anova(Mod1, Mod1.null, test='Chisq')
+		  # Comparison	
+		  aic.model=AIC(Mod1,Mod1.null)
+		# store coefficients
+		coeff.full.model = data.frame((Mod1.summary$coefficients), 
+		                              adj.p=p.adjust(Mod1.summary$coefficients[,2]), 
+		                              ASVcode=rep(unique(OTUdata2$ASVcode), 2), 
+		                              Family=rep(OTUdata2$Family[i],2) ,
+		                              Genus=rep(OTUdata2$Genus[i],2), 
+		                              ASVcode=rep(ASVlist2$ASVcode[i],2)) 
+		# store comparison
+		
+		coeff.aov = data.frame(model=c(paste(unique(OTUdata2$ASVcode), 'null.model', sep='_'),
+		                               paste(unique(OTUdata2$ASVcode), 'full.model', sep='_')), 
+		                       resid.df=Mod1.aov[3], 
+		                       resid.theta=Mod1.aov[2], 
+		                       #deviance=Mod1.aov[[4]], 
+		                       AIC=aic.model$AIC, 
+		                       p.value=c('NA', (Mod1.aov$`Pr(Chi)`)[2]), 
+		                       adj.p=c('NA', p.adjust(Mod1.aov$`Pr(Chi)`)[2]), 
+		                       Family=rep(OTUdata2$Family[i],2) ,
+		                       Genus=rep(OTUdata2$Genus[i],2), 
+		                       ASVcode=rep(OTUdata2$ASVcode[i],2))		
+		
+		# format result table
+	model.results.otuA=(rbind(model.results.otuA, coeff.full.model)) 			
+	model.evaluation.otuA=(rbind(model.evaluation.otuA, coeff.aov))					
+	
+	  # print taxa number, family and genus as a way to track progress of the function: remove if >100 taxa
+	print(paste(OTUdata$Family[i], OTUdata$Genus[i], i))
+  }
+dim(model.results.otuA) # check the dimensions
+  
+  # add names to the columns of the output tables
+	names(model.results.otuA)=c('Estimate', 'Sdev', 'z.value', 'p.value', 'p.adjust', 'ASV2','Family', 'Genus', 'ASVcode')
+  names(model.evaluation.otuA)=c('Model', 'Resid.dev', 'theta', 'AIC', 'p.value','adjust.p', 'Family', 'Genus', 'ASVcode')
+  
+  # store both data frames within a list
+  model.results.output = list(coefficients=model.results.otuA, evaluation=model.evaluation.otuA)
+
+return(model.results.output)
+}
+```
+
+Test with the list of taxa ASVlist2. 
+```{r include=FALSE}
+model.results.trial1=IterativeGLM1(otumelt3, ASVlist2[1:30,])
+```
+
+(this part was removed from the latest iteration) - will focus on the glm instead of the null comparison.
+Clean  the output of the function: these tables will go to supplementary materials. 
+```{r eval=FALSE}
+models.coefficients1 = model.results.trial1$coefficients
+models.evals1 = model.results.trial1$evaluation
+```
+And save
+```{r}
+outPATH='output_files/'
+date=Sys.Date()
+    glm.models.coeff = paste(outPATH, 'ASV_glm_time_subset_FunExp1', date,'.txt', sep='')
+    glm.models.evals = paste(outPATH, 'ASV_glm_evals_FunExp1', date,'.txt', sep='')
+
+	#write.table(models.coefficients1, glm.models.coeff, sep="\t")
+	#write.table(models.evals1, glm.models.evals, sep="\t")
+```
+
+### ID taxa that increase with time from Iterative model
+Can I identify which taxa are increasing with age relably to later test whether they are correlated with function?
+
+```{r include=FALSE}
+# create lists to store potential ASVs correlated with function
+list_asv_slopePos.time=c()
+list_asv_noslope.time=c()
+list_asv_slopeNeg.time=c()
+
+# list of ASV codes to go through:
+ASVtime_names=ASVlist2$ASVcode
+
+for (i in 1:length(ASVtime_names)){
+  # check that the ASV is present in the dataset
+  if (sum(which(models.coefficients1$ASVcode==ASVtime_names[i]))==0) { print(paste(ASVtime_names[i], 'ASV not found'))
+    } else {
+    # extract the slope estimate:
+      ASVabund.estimate= models.coefficients1[which(models.coefficients1$ASVcode==ASVtime_names[i]),1][2]
+    # extract the p value:
+      ASVabund.p= models.coefficients1[which(models.coefficients1$ASVcode==ASVtime_names[i]),5][2]
+      ASVcode= models.coefficients1[which(models.coefficients1$ASVcode==ASVtime_names[i]),8][2]
+      ASVGenus= models.coefficients1[which(models.coefficients1$ASVcode==ASVtime_names[i]),6][2]
+      
+    # inform of progress:  
+      print(paste('Progress:', i, ASVcode, ASVGenus))
+    
+    # check that output differs from NA
+      if (is.na(ASVabund.p)) { 
+          print(paste(ASVtime_names[i], 'p value was NA'))
+          list_asv_noslope.time=rbind(list_asv_noslope.time, c(ASVtime_names[i], ASVabund.estimate, ASVabund.p))
+                             } else {
+        
+    # Sort the taxa
+      # if the taxa has a positive slope estimate and a significant adjusted p value -> accept and store ASVcode
+        if (ASVabund.estimate > 0 && ASVabund.p < 0.05 ) {
+          list_asv_slopePos.time=rbind(list_asv_slopePos.time, c(ASVtime_names[i], ASVabund.estimate, ASVabund.p))
+            } else   { 
+       # if the taxa has a negative slope estimate and a significant adjusted p value -> accept and store ASVcode
+        if (ASVabund.estimate < 0 && ASVabund.p < 0.05 ) {
+          list_asv_slopeNeg.time=rbind(list_asv_slopeNeg.time, c(ASVtime_names[i], ASVabund.estimate, ASVabund.p))
+            } else {
+       # store non significant and NA results ASV in noslope list
+        list_asv_noslope.time=rbind(list_asv_noslope.time, c(ASVtime_names[i], ASVabund.estimate, ASVabund.p)) 
+                   }
+                    } 
+                                }
+                                }
+        }
+
+```
+
+#### Edit the sorted tables and save
+Change from matrix to data frame and add column names.
+Focus on negative and positive slopes from here on. 
+```{r}
+list_asv_slopePos.time.df=data.frame(list_asv_slopePos.time)
+  colnames(list_asv_slopePos.time.df)=c('ASVcode', 'ASVestimate', 'ASVp.value')
+  listPos.rank.time=list_asv_slopePos.time.df[order(list_asv_slopePos.time.df$ASVestimate),]
+  
+list_asv_slopeNeg.time.df=data.frame(list_asv_slopeNeg.time)
+  colnames(list_asv_slopeNeg.time.df)=c('ASVcode', 'ASVestimate', 'ASVp.value')
+  listNegslope.rank.time=list_asv_slopeNeg.time.df[order(list_asv_slopeNeg.time.df$ASVestimate),]
+  
+list_asv_noslope.time.df=data.frame(list_asv_noslope.time)
+  colnames(list_asv_noslope.time.df)=c('ASVcode', 'ASVestimate', 'ASVp.value')
+  listnoslope.rank.time=list_asv_noslope.time.df[order(list_asv_noslope.time.df$ASVestimate),]
+```
+
+Merge the lists with their taxonomic affiliations
+```{r}
+listPos.rank_taxa.time=left_join(listPos.rank.time, taxatable)
+listnoslope.rank_taxa.time=left_join(listnoslope.rank.time, taxatable)
+listNeg.rank_taxa.time=left_join(listNegslope.rank.time, taxatable)
+
+```
+Save them as a single table
+```{r}
+ ASVslope.sorted.time=rbind(
+    data.frame(Slope.time=rep('Positive',dim(listPos.rank_taxa.time)[1]), listPos.rank_taxa.time),
+    data.frame(Slope.time=rep('Neutral',dim(listnoslope.rank_taxa.time)[1]), listnoslope.rank_taxa.time),
+    data.frame(Slope.time=rep('Negative',dim(listNeg.rank_taxa.time)[1]), listNeg.rank_taxa.time))
+    
+ASVslope.sorted_path = paste(outPATH, 'ASVslope_sorted_time_FunExp1', date,'.txt', sep='')
+
+	#write.table(ASVslope.sorted.time, ASVslope.sorted_path, sep="\t")
+```
