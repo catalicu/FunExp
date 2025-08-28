@@ -2,18 +2,23 @@ This README.md file was updated on 06/27/2025.
 
 ## A. Paper associated with this archive 
 Title: 'Opposing effects of succession on bacterial diversity and function within pitcher plant (Sarracenia purpurea) leaves' 
-Citation: To be updated upon acceptance 
+Citation: Cuellar-Gempeler, C., C. terHorst and T.E. Miller. Opposing effects of succession on bacterial diversity and function within pitcher plant (Sarracenia purpurea) leaves. The American Naturalist. In press.
 
 Brief abstract: 
 How biodiversity and ecosystem functions change with succession has proven to be difficult to predict. We hypothesize that community diversity and function may respond in opposite ways to successional drivers such as nutrient availability, species interactions or abiotic stress. The microbial communities within Sarracenia purpurea leaves perform degradation functions, providing essential nutrients to the plant, but we know little about how succession within the leaf influences bacterial diversity and degradation. We collected pitcher plant fluid from leaves aged 2 to 24 weeks to use in microcosm experiments. We added a common bacterivore to half of the replicated microcosms to establish whether predation is a central successional driver. We used amplicon sequencing and a degradation assay to quantify diversity and ecosystem function.
 
 ## B. Author information: 
-Names, institutions of all authors: To be updated upon acceptance. 
+Authors: Cuellar-Gempeler, Catalin (1), C. terHorst(2) and T. Miller(3). 
+Affiliations: 
+1 California State Polytechnic University, Humboldt, ORCID: 0000-0002-2634-9599
+2 California State University, Northridge, ORCID: 0000-0001-7261-2178
+3 Florida State University, ORCID: 0000-0002-2654-4079
+
 
 ## C. Contact information
-Name: To be updated upon acceptance  
-Address:To be updated upon acceptance  
-Email:To be updated upon acceptance 
+Name: Catalina Cuellar-Gempeler
+Address: 1st Harpst Street, Arcata CA. 95521. 
+Email: ccg@humboldt.edu 
 
 # DATA & CODE FILE OVERVIEW
 This data repository consist of data files, code scripts, and this README document, with the following data and code filenames and variables. 
