@@ -81,11 +81,16 @@ NMDS.table2 = data.frame(NMDS1 = meta.table2.nmds2$NMDS1,
                         group=factor(meta.table2.nmds2$leaf_age))
 
 NMDS.mean=aggregate(NMDS.table2[,1:2],list(group=NMDS.table2$group),mean)
+#check for groups with few samples:
+NMDS.table3=NMDS.table2[-which(NMDS.table2$group==names(
+  which(table(NMDS.table2$group)==min(table(NMDS.table2$group))))),]
+NMDS.table3$group=factor(NMDS.table3$group)
+
 df_ell <- data.frame()
 
-for(g in levels(NMDS.table2$group)){
+for(g in levels(NMDS.table3$group)){
   #g='A10'
-  df_ell <- rbind(df_ell, cbind(as.data.frame(with(NMDS.table2[NMDS.table2$group==g,],
+  df_ell <- rbind(df_ell, cbind(as.data.frame(with(NMDS.table3[NMDS.table3$group==g,],
               veganCovEllipse(cov.wt(cbind(NMDS1,NMDS2),wt=rep(1/length(NMDS1),
               length(NMDS1)))$cov,center=c(mean(NMDS1),mean(NMDS2)))))
                                 ,group=g))
